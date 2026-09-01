@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <!-- Rich Blue-to-Indigo Gradient matching the brand screenshot -->
+    <linearGradient id="vaultdropBg" x1="0" y1="0" x2="52" y2="52" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="45%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </linearGradient>
+
+    <!-- Subtle Glow Shadow for paper plane -->
+    <filter id="planeGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#ffffff" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Blue Squircle Base -->
+  <rect x="4" y="10" width="46" height="46" rx="14" fill="url(#vaultdropBg)" />
+
+  <!-- Crisp White Origami Paper Plane Icon -->
+  <g transform="translate(13, 19)" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#planeGlow)">
+    <path d="M25.5 2.5L10.5 17.5" />
+    <path d="M25.5 2.5L17.5 25.5L10.5 17.5L2.5 10.5L25.5 2.5Z" />
+  </g>
+
+  <!-- Top-Right Floating Green Live Status Dot with dark backing ring -->
+  <circle cx="48" cy="12" r="6.5" fill="#0b1329" />
+  <circle cx="48" cy="12" r="5" fill="#4ade80" />
+</svg>
