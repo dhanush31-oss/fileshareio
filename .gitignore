@@ -13,6 +13,7 @@ dist-ssr/
 .vinxi/
 .tanstack/
 .nitro/
+.netlify/
 
 # Cloud Hosting & Wrangler
 .wrangler/
