@@ -1,3 +1,16 @@
+if (typeof globalThis !== "undefined") {
+  (globalThis as any).__exportAll =
+    (globalThis as any).__exportAll ||
+    function (target: any, all: any) {
+      for (const name in all) {
+        if (Object.prototype.hasOwnProperty.call(all, name)) {
+          target[name] = all[name];
+        }
+      }
+      return target;
+    };
+}
+
 import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
