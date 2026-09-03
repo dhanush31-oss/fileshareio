@@ -10,6 +10,14 @@ import { toast } from "sonner";
 import { copyToClipboard } from "@/lib/clipboard";
 import { getCoinLogo } from "@/components/CoinIcons";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
   AlertCircle,
   ArrowUpRight,
   Bell,
@@ -21,6 +29,7 @@ import {
   Download,
   ExternalLink,
   Eye,
+  FileImage,
   FileLock2,
   FolderLock,
   Layers,
@@ -72,6 +81,7 @@ function DashboardPage() {
   const [joinCode, setJoinCode] = useState("");
   const [filterTab, setFilterTab] = useState<"all" | "action" | "active" | "approved">("all");
   const [recheckingId, setRecheckingId] = useState<string | null>(null);
+  const [selectedProofModal, setSelectedProofModal] = useState<any | null>(null);
 
   useEffect(() => {
     ensureSession();
@@ -157,22 +167,30 @@ function DashboardPage() {
   async function openProof(proofId: string) {
     try {
       const targetProof = allProofs.find((p: any) => p.id === proofId);
-      if (targetProof?.proof_path) {
+      if (!targetProof) {
+        toast.error("Proof details not found");
+        return;
+      }
+
+      let url = targetProof.proof_url;
+      if (!url && targetProof.proof_path && !targetProof.proof_path.includes("/tx-") && !targetProof.proof_path.startsWith("tx-")) {
         const { supabase } = await import("@/integrations/supabase/client");
         const { data: signed } = await supabase.storage
           .from("payment-proofs")
-          .createSignedUrl(targetProof.proof_path, 180);
+          .createSignedUrl(targetProof.proof_path, 3600);
 
-        const url =
+        url =
           signed?.signedUrl ||
           supabase.storage.from("payment-proofs").getPublicUrl(targetProof.proof_path).data
-            .publicUrl;
-        if (url) {
-          window.open(url, "_blank", "noopener");
-          return;
-        }
+            .publicUrl ||
+          null;
       }
-      toast.error("Proof screenshot not available");
+
+      if (url) {
+        setSelectedProofModal({ ...targetProof, proof_url: url });
+      } else {
+        toast.error("No screenshot proof was uploaded for this submission");
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to open proof");
     }
@@ -492,15 +510,25 @@ function DashboardPage() {
                             </div>
 
                             <div className="flex flex-wrap items-center gap-2 shrink-0 w-full sm:w-auto">
-                              {p.proof_path && (
+                              {Boolean(
+                                p.has_screenshot ||
+                                  p.proof_url ||
+                                  (p.proof_path &&
+                                    !p.proof_path.includes("/tx-") &&
+                                    !p.proof_path.startsWith("tx-")),
+                              ) ? (
                                 <Button
                                   size="sm"
                                   variant="outline"
                                   onClick={() => openProof(p.id)}
-                                  className="h-8 text-xs gap-1 flex-1 sm:flex-none"
+                                  className="h-8 text-xs gap-1.5 flex-1 sm:flex-none border-primary/40 text-primary hover:bg-primary/10 font-semibold"
                                 >
                                   <Eye className="size-3.5" /> Proof
                                 </Button>
+                              ) : (
+                                <span className="text-[11px] text-muted-foreground italic px-1">
+                                  No screenshot
+                                </span>
                               )}
 
                               {!p.chain_verified && p.tx_hash && (
@@ -597,6 +625,121 @@ function DashboardPage() {
             </div>
           </section>
         )}
+
+        {/* Payment Proof Photo Modal */}
+        <Dialog
+          open={Boolean(selectedProofModal)}
+          onOpenChange={(open) => !open && setSelectedProofModal(null)}
+        >
+          <DialogContent className="max-w-2xl bg-card border-border shadow-2xl p-4 sm:p-6">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-base sm:text-lg font-bold">
+                <FileImage className="size-5 text-primary" />
+                Payment Proof Screenshot
+              </DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground">
+                Submitted {selectedProofModal ? new Date(selectedProofModal.created_at).toLocaleString() : ""}
+              </DialogDescription>
+            </DialogHeader>
+
+            {selectedProofModal && (
+              <div className="space-y-4 my-2">
+                {/* Image display */}
+                <div className="relative overflow-hidden rounded-xl border border-border bg-black/70 flex items-center justify-center min-h-[220px] max-h-[480px]">
+                  {selectedProofModal.proof_url ? (
+                    <img
+                      src={selectedProofModal.proof_url}
+                      alt="Buyer Payment Proof Screenshot"
+                      className="w-full h-auto max-h-[460px] object-contain rounded-lg"
+                    />
+                  ) : (
+                    <div className="text-center p-8 text-muted-foreground text-xs">
+                      <p>Screenshot not available</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Proof Details summary */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs bg-muted/40 p-3 rounded-xl border border-border/60">
+                  {selectedProofModal.tx_hash && (
+                    <div className="col-span-full">
+                      <span className="text-muted-foreground block text-[10px] uppercase font-bold">Transaction Hash:</span>
+                      <span className="font-mono text-primary break-all">{selectedProofModal.tx_hash}</span>
+                    </div>
+                  )}
+                  {selectedProofModal.note && (
+                    <div className="col-span-full">
+                      <span className="text-muted-foreground block text-[10px] uppercase font-bold">Buyer Note:</span>
+                      <span className="text-foreground">{selectedProofModal.note}</span>
+                    </div>
+                  )}
+                  <div>
+                    <span className="text-muted-foreground block text-[10px] uppercase font-bold">Verification:</span>
+                    <span className={selectedProofModal.chain_verified ? "text-emerald-400 font-semibold" : "text-amber-400 font-semibold"}>
+                      {selectedProofModal.chain_verified ? "✓ On-Chain Confirmed" : "⏳ Pending Seller Review"}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground block text-[10px] uppercase font-bold">Status:</span>
+                    <span className="capitalize font-semibold text-foreground">{selectedProofModal.status}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <DialogFooter className="flex-col sm:flex-row gap-2 pt-2 border-t border-border/60">
+              {selectedProofModal?.proof_url && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.open(selectedProofModal.proof_url, "_blank", "noopener")}
+                  className="gap-1.5 text-xs mr-auto"
+                >
+                  <ExternalLink className="size-3.5" /> Open Full Image
+                </Button>
+              )}
+
+              {selectedProofModal?.status === "pending" && (
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => {
+                      act(selectedProofModal.id, true);
+                      setSelectedProofModal(null);
+                    }}
+                    className="gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex-1 sm:flex-none"
+                  >
+                    <Check className="size-3.5" /> Approve & Release
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => {
+                      act(selectedProofModal.id, false);
+                      setSelectedProofModal(null);
+                    }}
+                    className="gap-1.5 text-xs flex-1 sm:flex-none"
+                  >
+                    <X className="size-3.5" /> Reject
+                  </Button>
+                </div>
+              )}
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedProofModal(null)}
+                className="text-xs"
+              >
+                Close
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </AppShell>
   );

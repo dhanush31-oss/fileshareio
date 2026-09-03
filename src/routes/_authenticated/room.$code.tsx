@@ -113,6 +113,7 @@ function RoomPage() {
   const qc = useQueryClient();
 
   const [proofFile, setProofFile] = useState<File | null>(null);
+  const [proofPreviewUrl, setProofPreviewUrl] = useState<string | null>(null);
   const [note, setNote] = useState("");
   const [txHash, setTxHash] = useState("");
   const [unlockCode, setUnlockCode] = useState(code || "");
@@ -120,6 +121,16 @@ function RoomPage() {
   const [showWalletQr, setShowWalletQr] = useState(false);
   const [busy, setBusy] = useState(false);
   const [downloading, setDownloading] = useState(false);
+
+  useEffect(() => {
+    if (proofFile) {
+      const url = URL.createObjectURL(proofFile);
+      setProofPreviewUrl(url);
+      return () => URL.revokeObjectURL(url);
+    } else {
+      setProofPreviewUrl(null);
+    }
+  }, [proofFile]);
 
   useEffect(() => {
     ensureSession();
@@ -166,17 +177,14 @@ function RoomPage() {
     e.preventDefault();
     if (!room) return;
 
-    if (!txHash.trim() && !proofFile) {
-      toast.error("Please provide either your Transaction Hash or a payment screenshot");
+    if (!proofFile) {
+      toast.error("Please upload a payment screenshot / receipt photo");
       return;
     }
 
     setBusy(true);
     try {
-      let proofBase64: string | undefined;
-      if (proofFile) {
-        proofBase64 = await fileToBase64(proofFile);
-      }
+      const proofBase64 = await fileToBase64(proofFile);
 
       const res = await fetch("/api/room", {
         method: "POST",
@@ -186,9 +194,9 @@ function RoomPage() {
           roomId: room.id,
           txHash: txHash.trim(),
           note: note.trim(),
-          proofName: proofFile?.name || (txHash ? "Transaction Hash" : "Payment Proof"),
+          proofName: proofFile.name,
           proofBase64,
-          mimeType: proofFile?.type || "image/png",
+          mimeType: proofFile.type || "image/png",
         }),
       });
 
@@ -539,24 +547,63 @@ function RoomPage() {
               </p>
             </div>
 
-            <div className="space-y-1.5">
-              <Label className="text-xs font-medium">Payment Screenshot / Receipt (optional)</Label>
-              <label
-                htmlFor="proof"
-                className="flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-border bg-muted/20 px-4 py-3 text-xs text-muted-foreground hover:border-primary/60 hover:bg-muted/40 transition-colors"
-              >
-                <UploadCloud className="size-4 text-primary" />
-                {proofFile ? (
-                  <span className="font-medium text-foreground">{proofFile.name}</span>
-                ) : (
-                  <span>Click to attach screenshot proof (PNG, JPG, PDF)</span>
-                )}
-              </label>
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold text-foreground flex items-center gap-1">
+                Payment Screenshot / Receipt <span className="text-destructive font-bold">* (Required)</span>
+              </Label>
+              
+              {!proofPreviewUrl ? (
+                <label
+                  htmlFor="proof"
+                  className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-primary/40 bg-primary/5 p-5 text-xs text-muted-foreground hover:border-primary hover:bg-primary/10 transition-all text-center"
+                >
+                  <div className="flex size-10 items-center justify-center rounded-full bg-primary/15 text-primary">
+                    <UploadCloud className="size-5" />
+                  </div>
+                  <div>
+                    <span className="font-semibold text-foreground">Click to upload payment screenshot</span>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">PNG, JPG, JPEG, WEBP or PDF receipt</p>
+                  </div>
+                </label>
+              ) : (
+                <div className="relative rounded-xl border border-primary/40 bg-card p-3 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    {proofFile?.type.startsWith("image/") && proofPreviewUrl ? (
+                      <img
+                        src={proofPreviewUrl}
+                        alt="Payment Proof Preview"
+                        className="size-14 rounded-lg object-cover border border-border bg-black/40 shrink-0"
+                      />
+                    ) : (
+                      <div className="flex size-14 items-center justify-center rounded-lg bg-primary/10 text-primary shrink-0 border border-primary/20">
+                        <FileImage className="size-6" />
+                      </div>
+                    )}
+                    <div className="min-w-0 text-xs">
+                      <p className="font-semibold text-foreground truncate">{proofFile?.name}</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        {proofFile ? formatBytes(proofFile.size) : ""} · Ready for seller review
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setProofFile(null)}
+                    className="text-xs text-destructive hover:bg-destructive/10 shrink-0 h-8 px-2"
+                  >
+                    <X className="size-4 mr-1" /> Remove
+                  </Button>
+                </div>
+              )}
+
               <input
                 id="proof"
                 type="file"
                 accept="image/*,application/pdf"
                 className="hidden"
+                required
                 onChange={(e) => setProofFile(e.target.files?.[0] ?? null)}
               />
             </div>

@@ -52,11 +52,45 @@ export const Route = createFileRoute("/api/room")({
             .order("created_at", { ascending: true });
 
           // 3. Fetch payment proofs
-          const { data: proofs } = await supabaseAdmin
+          const { data: rawProofs } = await supabaseAdmin
             .from("payment_proofs")
             .select("*")
             .eq("room_id", room.id)
             .order("created_at", { ascending: false });
+
+          const proofs = await Promise.all(
+            (rawProofs ?? []).map(async (p) => {
+              const hasRealFile = Boolean(
+                p.proof_path &&
+                  !p.proof_path.includes("/tx-") &&
+                  !p.proof_path.startsWith("tx-") &&
+                  p.proof_path.trim() !== "",
+              );
+
+              let proofUrl: string | null = null;
+              if (hasRealFile) {
+                try {
+                  const { data: signed } = await supabaseAdmin.storage
+                    .from("payment-proofs")
+                    .createSignedUrl(p.proof_path, 86400);
+
+                  proofUrl =
+                    signed?.signedUrl ||
+                    supabaseAdmin.storage.from("payment-proofs").getPublicUrl(p.proof_path).data
+                      .publicUrl ||
+                    null;
+                } catch (err) {
+                  console.warn("[api/room] Proof signed URL notice:", err);
+                }
+              }
+
+              return {
+                ...p,
+                has_screenshot: Boolean(hasRealFile && proofUrl),
+                proof_url: proofUrl,
+              };
+            }),
+          );
 
           return new Response(
             JSON.stringify({
@@ -83,7 +117,7 @@ export const Route = createFileRoute("/api/room")({
                 buyer_id: room.buyer_id,
               },
               files: files || [],
-              proofs: proofs || [],
+              proofs: proofs,
             }),
             {
               status: 200,
@@ -151,10 +185,10 @@ export const Route = createFileRoute("/api/room")({
             const buyerId =
               room.buyer_id ||
               (await resolveUserId(supabaseAdmin, request.headers.get("authorization")));
-            let finalProofPath = proofPath;
+            let finalProofPath: string | null = null;
 
             if (body.proofBase64) {
-              const safeName = (proofName || "proof.png").replace(/[^\w.\-]+/g, "_");
+              const safeName = (proofName || "payment-proof.png").replace(/[^\w.\-]+/g, "_");
               finalProofPath = `${buyerId}/${crypto.randomUUID()}-${safeName}`;
               const buffer = Buffer.from(body.proofBase64, "base64");
               const { error: uploadErr } = await supabaseAdmin.storage
@@ -173,8 +207,8 @@ export const Route = createFileRoute("/api/room")({
               .insert({
                 room_id: room.id,
                 buyer_id: buyerId,
-                proof_path: finalProofPath || `${buyerId}/tx-${Date.now()}`,
-                proof_name: (proofName || "Transaction Hash").slice(0, 200),
+                proof_path: finalProofPath,
+                proof_name: (proofName || (finalProofPath ? "Payment Screenshot" : "Transaction Hash")).slice(0, 200),
                 note: String(note || "")
                   .trim()
                   .slice(0, 1000),

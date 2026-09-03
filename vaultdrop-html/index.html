@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vaultdrop Enterprise — Confidential Digital Asset Settlement & Multi-Chain Escrow</title>
+  <meta name="description" content="Global enterprise digital asset escrow protocol with zero-knowledge cryptographic custody, instant multi-chain oracle verification, and secure cloud delivery.">
+  
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Supabase JS Client v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Dynamic Particle Grid Canvas -->
+  <canvas id="bg-canvas"></canvas>
+
+  <div class="app-wrapper">
+    <!-- Top Announcement & Live Gas Ticker -->
+    <div class="top-ticker">
+      <div class="ticker-left">
+        <span class="ticker-badge"><span class="live-dot"></span> ORACLE MAINNET ACTIVE</span>
+        <span>Zero-Knowledge cryptographic delivery & multi-chain escrow across 140+ countries.</span>
+      </div>
+      <div class="gas-ticker">
+        <div class="gas-item">ETH: <span id="eth-gas-val">12 Gwei</span></div>
+        <div class="gas-item">SOL: <span id="sol-tps-val">2,840 TPS</span></div>
+        <div class="gas-item">BASE: <span id="base-gas-val">0.001 Gwei</span></div>
+        <div class="gas-item" style="color:var(--accent-emerald);">● 99.99% Cloud Sentry</div>
+      </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <header class="navbar">
+      <div class="container nav-content">
+        <a class="logo" onclick="showView('home')">
+          <div class="logo-icon">
+            <i data-lucide="shield-check" style="color:#fff;width:22px;height:22px;"></i>
+          </div>
+          <span>Vaultdrop <span class="tag">ENTERPRISE</span></span>
+        </a>
+
+        <ul class="nav-links">
+          <li><a class="nav-link active" id="nav-home" onclick="showView('home')"><i data-lucide="home" style="width:15px;height:15px;"></i> Home</a></li>
+          <li><a class="nav-link" id="nav-templates" onclick="showView('templates')"><i data-lucide="layers" style="width:15px;height:15px;"></i> Blueprints</a></li>
+          <li><a class="nav-link" id="nav-explorer" onclick="showView('explorer')"><i data-lucide="compass" style="width:15px;height:15px;"></i> Ledger Explorer</a></li>
+          <li><a class="nav-link" id="nav-developers" onclick="showView('developers')"><i data-lucide="code-2" style="width:15px;height:15px;"></i> REST API & SDK</a></li>
+          <li><a class="nav-link" id="nav-security" onclick="showView('security')"><i data-lucide="lock" style="width:15px;height:15px;"></i> Security Architecture</a></li>
+          <li><a class="nav-link" id="nav-pricing" onclick="showView('pricing')"><i data-lucide="coins" style="width:15px;height:15px;"></i> Pricing</a></li>
+          <li><a class="nav-link" id="nav-support" onclick="showView('support')"><i data-lucide="life-buoy" style="width:15px;height:15px;"></i> Support</a></li>
+        </ul>
+
+        <div class="nav-actions">
+          <select id="currency-select" class="select-input" style="padding:6px 10px; font-size:0.8rem; width:auto; border-radius:8px;" onchange="handleCurrencyChange()">
+            <option value="USD">💵 USD</option>
+            <option value="EUR">💶 EUR</option>
+            <option value="GBP">💷 GBP</option>
+            <option value="ETH">⟠ ETH</option>
+            <option value="SOL">◎ SOL</option>
+          </select>
+          <button class="btn btn-secondary" onclick="showView('dashboard')"><i data-lucide="folder-lock" style="width:16px;height:16px;"></i> My Transfers</button>
+          <button class="btn btn-primary" onclick="showView('send')"><i data-lucide="upload-cloud" style="width:16px;height:16px;"></i> Lock & Send</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- =========================================================================
+         1. HOME VIEW
+         ========================================================================= -->
+    <main id="view-home" class="view-section active">
+      <div class="container">
+        <div class="hero">
+          <div class="eyebrow-badge">
+            <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
+            INSTITUTIONAL DIGITAL ASSET SETTLEMENT PROTOCOL • V2.4 PRO
+          </div>
+          <h1 class="hero-title">
+            Confidential Digital Asset Escrow <br>
+            <span class="gradient-text">for Global Creators & Enterprises.</span>
+          </h1>
+          <p class="hero-subtitle">
+            Lock source code repositories, 3D master archives, confidential M&A data rooms, or high-value digital IP. Assets are encrypted client-side, held in private Supabase Cloud Vaults, and released automatically upon verified on-chain payment.
+          </p>
+
+          <!-- Dual Action Cards Grid -->
+          <div class="action-card-grid">
+            <div class="spotlight-card action-card">
+              <div class="action-card-icon">
+                <i data-lucide="upload-cloud" style="width:26px;height:26px;"></i>
+              </div>
+              <h3>Send Files & Lock Escrow</h3>
+              <p>Upload multi-file bundles with automatic SHA-256 checksums, configure crypto prices, and get a shareable 6-digit room code.</p>
+              <button class="btn btn-primary btn-lg" style="width:100%;" onclick="showView('send')">
+                <i data-lucide="arrow-right" style="width:18px;height:18px;"></i> Create Escrow Room
+              </button>
+            </div>
+
+            <div class="spotlight-card action-card">
+              <div class="action-card-icon" style="background: rgba(16, 185, 129, 0.12); color: #10b981; border-color: rgba(16, 185, 129, 0.25);">
+                <i data-lucide="key-round" style="width:26px;height:26px;"></i>
+              </div>
+              <h3>Inspect & Unlock Room</h3>
+              <p>Enter the 6-digit transfer code you received from the seller to verify file checksums, send crypto, and download your assets.</p>
+              <div class="unlock-bar">
+                <input type="text" id="quick-unlock-code" class="input-code" placeholder="000000" maxlength="6" onkeydown="if(event.key==='Enter') quickUnlock()">
+                <button class="btn btn-success" onclick="quickUnlock()"><i data-lucide="unlock" style="width:16px;height:16px;"></i> Unlock</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Network Stats Strip -->
+          <div class="stats-strip">
+            <div class="stat-box">
+              <div class="stat-val" id="total-vol-stat">$24.8M+</div>
+              <div class="stat-label">Total Settled Volume</div>
+              <div class="stat-delta">▲ +18.6% MoM Growth</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-val">12,450+</div>
+              <div class="stat-label">Escrow Deals Completed</div>
+              <div class="stat-delta">100% Delivery Settlement</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-val">14.2s</div>
+              <div class="stat-label">Median Oracle Speed</div>
+              <div class="stat-delta">Multi-Chain Indexer</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-val">0.5%</div>
+              <div class="stat-label">Flat Protocol Fee</div>
+              <div class="stat-delta">Save 85% vs TradFi Wires</div>
+            </div>
+          </div>
+
+          <!-- Protocol Operational Flow (3-Step Guide) -->
+          <div style="text-align:center; margin-bottom: 30px;">
+            <h2 style="font-size: 2.2rem; font-weight:900;">How the Escrow Protocol Operates</h2>
+            <p style="color:var(--text-secondary); max-width:620px; margin:0 auto;">Trustless cryptographic settlement backed by client-side encryption and Supabase Vaults.</p>
+          </div>
+
+          <div class="steps-grid">
+            <div class="step-card">
+              <span class="step-num">STEP 01</span>
+              <h4>Client-Side Lock & Checksums</h4>
+              <p>Seller attaches multi-file archives. Files are hashed with SHA-256 and uploaded into private Supabase buckets with Row-Level Security.</p>
+            </div>
+            <div class="step-card">
+              <span class="step-num">STEP 02</span>
+              <h4>On-Chain Transfer & Oracle Sync</h4>
+              <p>Buyer enters the 6-digit room code, inspects asset sizes & checksums, sends crypto directly to the seller's wallet, and submits the TxHash.</p>
+            </div>
+            <div class="step-card">
+              <span class="step-num">STEP 03</span>
+              <h4>Cryptographic Release & Receipt</h4>
+              <p>Upon on-chain confirmation or seller approval, short-lived signed download links are generated and an official Escrow Certificate is issued.</p>
+            </div>
+          </div>
+
+          <!-- Interactive Settlement Calculator & Chart -->
+          <div class="sandbox-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+              <div>
+                <span class="ticker-badge"><i data-lucide="calculator" style="width:13px;height:13px;"></i> REAL-TIME FEE SIMULATOR</span>
+                <h3 style="font-size:1.6rem; font-weight:800; margin-top:8px;">Simulate Deal Settlement & Fee Savings</h3>
+              </div>
+              <div style="color:var(--text-muted); font-size:0.85rem; font-family:var(--font-mono);">Protocol Rate: 0.5% (Max cap $250)</div>
+            </div>
+
+            <div class="sandbox-grid">
+              <div>
+                <label style="font-size:0.88rem; color:var(--text-secondary); display:block; margin-bottom:10px; font-weight:600;">Asset Deal Value (USD)</label>
+                <input type="range" id="sim-slider" min="500" max="100000" step="500" value="10000" style="width:100%; accent-color:var(--primary);" oninput="updateSimulator()">
+                <div style="display:flex; justify-content:space-between; margin-top:8px; font-family:var(--font-mono); font-size:1.2rem; color:var(--primary); font-weight:800;">
+                  <span id="sim-val-display">$10,000 USD</span>
+                  <span id="sim-crypto-display">~3.70 ETH</span>
+                </div>
+
+                <div style="margin-top:20px; font-size:0.85rem; color:var(--text-muted); line-height:1.5;">
+                  💡 Traditional bank wires & legacy escrow services charge 3% to 6% with 3–5 business days settlement. Vaultdrop settles in <strong>under 15 seconds</strong> with only <strong>0.5%</strong> fees.
+                </div>
+              </div>
+
+              <div style="background:var(--bg-surface); padding:24px; border-radius:var(--radius-lg); border:1px solid var(--border-subtle); display:flex; flex-direction:column; justify-content:center; gap:12px;">
+                <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
+                  <span style="color:var(--text-secondary);">Vaultdrop Protocol Fee (0.5%):</span>
+                  <span style="font-weight:800; color:var(--primary);" id="sim-fee-display">$50.00</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
+                  <span style="color:var(--text-secondary);">Seller Net Settlement:</span>
+                  <span style="font-weight:800; color:var(--accent-emerald);" id="sim-payout-display">$9,950.00</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
+                  <span style="color:var(--text-secondary);">TradFi Legacy Escrow Fee:</span>
+                  <span style="font-weight:700; color:var(--accent-rose);" id="sim-tradfi-display">$450.00 (4.5%)</span>
+                </div>
+                <div style="border-top:1px solid var(--border-subtle); padding-top:10px; display:flex; justify-content:space-between; font-size:0.95rem;">
+                  <span style="color:#fff; font-weight:700;">Your Total Deal Savings:</span>
+                  <span style="font-weight:900; color:var(--accent-emerald);" id="sim-savings-display">+$400.00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+
+    <!-- =========================================================================
+         2. SEND FILES VIEW (CREATE ROOM)
+         ========================================================================= -->
+    <section id="view-send" class="view-section">
+      <div class="container">
+        <div class="form-card">
+          <div class="form-header">
+            <h2>Create Institutional Escrow Room</h2>
+            <p>Upload digital assets. Real-time SHA-256 checksums are calculated and files are locked in private Supabase storage.</p>
+          </div>
+
+          <form id="send-form" onsubmit="handleCreateRoom(event)">
+            <!-- Dropzone -->
+            <div class="dropzone" id="file-dropzone" onclick="document.getElementById('file-input').click()">
+              <i data-lucide="cloud-upload" class="dropzone-icon"></i>
+              <h4 style="font-size: 1.15rem; margin-bottom: 6px; font-weight:700;">Drag & Drop Digital Assets or Click to Browse</h4>
+              <p style="color:var(--text-muted); font-size: 0.88rem;">Source code, ZIP archives, 3D renders, PDF contracts, dataset weights (Up to 100MB per file)</p>
+              <input type="file" id="file-input" multiple style="display:none;" onchange="handleFileSelect(event)">
+            </div>
+
+            <!-- File List with Checksums -->
+            <div id="file-list" class="file-list"></div>
+
+            <!-- Upload Progress Bar -->
+            <div id="upload-progress-box" class="progress-container">
+              <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:8px;">
+                <span id="upload-status-text" style="font-weight:600; color:var(--primary);">Encrypting and storing in Supabase Vault...</span>
+                <span id="upload-percent-text" style="font-family:var(--font-mono); font-weight:700;">0%</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div id="upload-progress-bar" class="progress-bar-fill"></div>
+              </div>
+            </div>
+
+            <!-- Transfer Title & Description -->
+            <div class="form-group">
+              <label>Transfer Title / Deal Name</label>
+              <input type="text" id="deal-title" class="input-text" placeholder="e.g. Production Next.js SaaS Codebase + Docker Stack" required>
+            </div>
+
+            <div class="form-group">
+              <label>Deal Description & License Terms (Optional)</label>
+              <textarea id="deal-desc" class="textarea-input" placeholder="Specify repository handover instructions, license keys, or environment secrets..."></textarea>
+            </div>
+
+            <!-- Blockchain Network & Price -->
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:18px;">
+              <div class="form-group">
+                <label>Settlement Blockchain</label>
+                <select id="deal-chain" class="select-input" onchange="updateCurrencySymbol()">
+                  <option value="Ethereum">Ethereum (ETH / USDT / USDC)</option>
+                  <option value="Solana">Solana (SOL / USDC)</option>
+                  <option value="Bitcoin">Bitcoin (BTC)</option>
+                  <option value="Base">Base (ETH / USDC)</option>
+                  <option value="Polygon">Polygon (POL / USDT)</option>
+                  <option value="BNB Chain">BNB Smart Chain (BNB / BUSD)</option>
+                  <option value="Arbitrum">Arbitrum (ETH / USDC)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Amount / Price (<span id="chain-symbol-label">ETH</span>)</label>
+                <input type="number" step="any" id="deal-amount" class="input-text" placeholder="e.g. 1.25" required>
+              </div>
+            </div>
+
+            <!-- Receiving Wallet Address -->
+            <div class="form-group">
+              <label>Seller's Receiving Crypto Wallet Address</label>
+              <input type="text" id="deal-wallet" class="input-text" placeholder="0x... or Solana/Bitcoin address" required>
+            </div>
+
+            <button type="submit" id="submit-room-btn" class="btn btn-primary btn-lg" style="width:100%; margin-top:14px;">
+              <i data-lucide="lock" style="width:18px;height:18px;"></i> Lock Files & Generate 6-Digit Room Code
+            </button>
+          </form>
+
+          <!-- Room Created Success Result -->
+          <div id="room-created-result" style="display:none; text-align:center; padding-top:24px;">
+            <div style="width:70px; height:70px; background:rgba(16,185,129,0.15); color:#10b981; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px auto; border:2px solid rgba(16,185,129,0.3);">
+              <i data-lucide="check-circle-2" style="width:40px;height:40px;"></i>
+            </div>
+            <h3 style="font-size:1.8rem; font-weight:900;">Escrow Room Locked in Supabase!</h3>
+            <p style="color:var(--text-secondary); margin-bottom:24px;">Share this 6-digit room code or QR code with your recipient to inspect and complete settlement:</p>
+            
+            <div style="background:var(--bg-surface); padding:24px; border-radius:var(--radius-lg); border:1px solid var(--border-subtle); max-width:440px; margin:0 auto 28px auto; text-align:center;">
+              <div style="font-size:0.8rem; color:var(--text-muted); font-weight:700; letter-spacing:0.08em; margin-bottom:6px;">YOUR 6-DIGIT ROOM CODE</div>
+              <div id="created-code-display" style="font-family:var(--font-mono); font-size:2.6rem; font-weight:900; letter-spacing:0.25em; color:var(--primary); margin-bottom:16px;">000000</div>
+              
+              <!-- QR Code Container -->
+              <div class="qr-container" id="created-qr-code">
+                <!-- SVG QR Code rendered via JS -->
+              </div>
+            </div>
+
+            <div style="display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+              <button class="btn btn-secondary" onclick="copyRoomLink()"><i data-lucide="copy" style="width:16px;height:16px;"></i> Copy Room URL</button>
+              <button class="btn btn-primary" onclick="openCreatedRoom()"><i data-lucide="external-link" style="width:16px;height:16px;"></i> Open Escrow Room</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         3. ROOM VIEW (INSPECT, PAY, APPROVE, DOWNLOAD & CERTIFICATE)
+         ========================================================================= -->
+    <section id="view-room" class="view-section">
+      <div class="container">
+        <div class="room-card" id="room-content-card">
+          <!-- Room Top Info Header -->
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:18px; margin-bottom:28px; border-bottom:1px solid var(--border-subtle); padding-bottom:24px;">
+            <div>
+              <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+                <span id="room-code-tag" style="font-family:var(--font-mono); font-size:1.6rem; font-weight:900; color:var(--primary);">ROOM #000000</span>
+                <span id="room-status-badge" class="status-pill status-awaiting">Awaiting Payment</span>
+              </div>
+              <h2 id="room-title-display" style="font-size:1.8rem; font-weight:900;">Confidential Asset Transfer</h2>
+              <p id="room-desc-display" style="color:var(--text-secondary); font-size:0.92rem; margin-top:4px;">Secure escrow room containing locked archives and encrypted files.</p>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:0.8rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">SETTLEMENT AMOUNT</div>
+              <div id="room-price-display" style="font-size:1.8rem; font-weight:900; color:var(--accent-emerald); font-family:var(--font-mono);">0.00 ETH</div>
+              <div id="room-fiat-display" style="font-size:0.85rem; color:var(--text-muted); font-family:var(--font-mono);">~$0.00 USD</div>
+            </div>
+          </div>
+
+          <!-- Transfer Specs Grid -->
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:18px; margin-bottom:30px;">
+            <div style="background:var(--bg-surface); padding:18px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+              <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Receiving Network</div>
+              <div id="room-chain-display" style="font-weight:800; margin-top:4px; font-size:1.05rem;">Ethereum Mainnet</div>
+            </div>
+            <div style="background:var(--bg-surface); padding:18px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+              <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Locked Digital Files</div>
+              <div id="room-files-count-display" style="font-weight:800; margin-top:4px; font-size:1.05rem;">1 File (4.2 MB)</div>
+            </div>
+            <div style="background:var(--bg-surface); padding:18px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
+              <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Custody Security</div>
+              <div style="font-weight:800; margin-top:4px; font-size:1.05rem; color:var(--accent-emerald);">AES-256 Supabase Vault</div>
+            </div>
+          </div>
+
+          <!-- Seller Receiving Wallet Address & QR Code Box -->
+          <div style="background:rgba(56,189,248,0.04); border:1px solid rgba(56,189,248,0.25); padding:24px; border-radius:var(--radius-lg); margin-bottom:30px; display:flex; gap:24px; align-items:center; flex-wrap:wrap;">
+            <div class="qr-container" id="room-pay-qr">
+              <!-- SVG QR Code -->
+            </div>
+            <div style="flex:1; min-width:260px;">
+              <div style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:8px; font-weight:700;">SELLER'S RECEIVING WALLET ADDRESS:</div>
+              <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-input); padding:12px 16px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
+                <span id="room-wallet-display" style="font-family:var(--font-mono); font-size:0.92rem; overflow:hidden; text-overflow:ellipsis;">0x0000...0000</span>
+                <button class="btn btn-outline" style="padding:6px 12px; font-size:0.75rem;" onclick="copySellerWallet()"><i data-lucide="copy" style="width:14px;height:14px;"></i> Copy</button>
+              </div>
+              <div style="font-size:0.78rem; color:var(--text-muted); margin-top:8px;">Send exact crypto amount on the specified blockchain network to this address.</div>
+            </div>
+          </div>
+
+          <!-- Buyer Payment Action: Submit TxHash Proof -->
+          <div id="buyer-action-box" style="border-top:1px solid var(--border-subtle); padding-top:28px; margin-top:24px;">
+            <h3 style="font-size:1.3rem; font-weight:800; margin-bottom:8px; display:flex; align-items:center; gap:8px;">
+              <i data-lucide="shield" style="width:20px;height:20px;color:var(--primary);"></i> Submit On-Chain Payment Proof
+            </h3>
+            <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:18px;">Once your crypto transfer has been broadcast to the blockchain, enter your Transaction Hash (TxHash) below for oracle verification and seller release.</p>
+            
+            <div class="form-group">
+              <label>On-Chain Transaction Hash (TxHash) or Solana Signature</label>
+              <input type="text" id="payment-txhash" class="input-text" placeholder="0x... or 5Jk9a8...">
+            </div>
+
+            <button class="btn btn-primary" onclick="submitPaymentProof()"><i data-lucide="send" style="width:16px;height:16px;"></i> Submit Payment for Verification</button>
+          </div>
+
+          <!-- Seller Controls & Download Action Bar -->
+          <div style="border-top:1px solid var(--border-subtle); padding-top:28px; margin-top:28px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px;">
+            <div>
+              <span style="font-size:0.8rem; color:var(--text-muted); font-weight:700;">SELLER SETTLEMENT CONTROLS:</span>
+              <div style="display:flex; gap:12px; margin-top:8px;">
+                <button class="btn btn-success" onclick="approveRelease()"><i data-lucide="check-circle-2" style="width:16px;height:16px;"></i> Approve & Release Files</button>
+                <button class="btn btn-danger" onclick="rejectPayment()"><i data-lucide="alert-triangle" style="width:16px;height:16px;"></i> Flag Dispute</button>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:12px; align-items:center;">
+              <button class="btn btn-outline" onclick="openCertificateModal()"><i data-lucide="file-text" style="width:16px;height:16px;"></i> View Escrow Certificate</button>
+              <button id="download-files-btn" class="btn btn-lg btn-primary" style="opacity:0.5; pointer-events:none;" onclick="triggerDownload()">
+                <i data-lucide="download" style="width:18px;height:18px;"></i> Download Files (Locked)
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         4. DASHBOARD VIEW (TRANSFERS COMMAND CENTER)
+         ========================================================================= -->
+    <section id="view-dashboard" class="view-section">
+      <div class="container">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; flex-wrap:wrap; gap:18px;">
+          <div>
+            <h2 style="font-size:2.2rem; font-weight:900;">Transfers Command Center</h2>
+            <p style="color:var(--text-secondary);">Real-time ledger of your created and participated escrow transfers.</p>
+          </div>
+          <div style="display:flex; gap:12px;">
+            <input type="text" id="dashboard-search" class="input-text" placeholder="Search by Code, Title, Wallet..." style="width:260px; padding:10px 14px;" oninput="filterDashboardTable()">
+            <button class="btn btn-primary" onclick="showView('send')"><i data-lucide="plus" style="width:16px;height:16px;"></i> New Transfer</button>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Room Code</th>
+                <th>Deal Title</th>
+                <th>Settlement Amount</th>
+                <th>Blockchain Network</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="dashboard-table-body">
+              <!-- Populated dynamically via app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         5. EXPLORER VIEW (PUBLIC ESCROW LEDGER)
+         ========================================================================= -->
+    <section id="view-explorer" class="view-section">
+      <div class="container">
+        <div style="text-align:center; margin-bottom:40px;">
+          <span class="eyebrow-badge"><i data-lucide="activity" style="width:14px;height:14px;"></i> LIVE TRANSACTION FEED</span>
+          <h2 style="font-size:2.4rem; font-weight:900;">Public Escrow Settlement Ledger</h2>
+          <p style="color:var(--text-secondary); max-width:660px; margin:0 auto;">Verifiable cryptographic record of institutional digital asset transfers across all supported chains.</p>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Settlement TxHash</th>
+                <th>Asset Category</th>
+                <th>Settled Value</th>
+                <th>Network</th>
+                <th>Confirmation</th>
+              </tr>
+            </thead>
+            <tbody id="explorer-table-body">
+              <!-- Dynamically populated and live updated via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         6. DEVELOPERS & REST API VIEW
+         ========================================================================= -->
+    <section id="view-developers" class="view-section">
+      <div class="container">
+        <div style="text-align:center; margin-bottom:40px;">
+          <span class="eyebrow-badge"><i data-lucide="terminal" style="width:14px;height:14px;"></i> DEVELOPER PLATFORM</span>
+          <h2 style="font-size:2.4rem; font-weight:900;">REST API & Supabase SDK</h2>
+          <p style="color:var(--text-secondary); max-width:660px; margin:0 auto;">Programmatically lock files, generate rooms, listen to webhook oracle triggers, and integrate escrow flows into your platform.</p>
+        </div>
+
+        <div style="background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:var(--radius-xl); padding:36px; max-width:920px; margin:0 auto; box-shadow:var(--shadow-lg);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-outline" style="padding:6px 14px; font-size:0.8rem; background:rgba(56,189,248,0.1); color:var(--primary); border-color:var(--primary);">cURL</button>
+              <button class="btn btn-outline" style="padding:6px 14px; font-size:0.8rem;">JavaScript / TypeScript</button>
+              <button class="btn btn-outline" style="padding:6px 14px; font-size:0.8rem;">Python</button>
+            </div>
+            <button class="btn btn-secondary" style="padding:6px 12px; font-size:0.78rem;" onclick="copyCodeSnippet()"><i data-lucide="copy" style="width:14px;height:14px;"></i> Copy</button>
+          </div>
+
+          <pre id="api-snippet" style="background:var(--bg-input); padding:20px; border-radius:var(--radius-md); font-family:var(--font-mono); font-size:0.88rem; color:#38bdf8; overflow-x:auto; border:1px solid var(--border-subtle); line-height:1.6;">curl -X POST https://bpeovumhxpgnwcirpgjl.supabase.co/rest/v1/rooms \
+  -H "apikey: sb_publishable_HmEs9ZmaLfcocZMB0eXpwQ_5o7-1X6T" \
+  -H "Authorization: Bearer sb_publishable_HmEs9ZmaLfcocZMB0eXpwQ_5o7-1X6T" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "room_code": "849201",
+    "title": "Production SaaS Repository Transfer",
+    "price_amount": 2.5,
+    "chain": "Ethereum",
+    "wallet_address": "0x71C836443ab54c5569315CC1EEC413E2192f153a",
+    "status": "awaiting_payment"
+  }'</pre>
+
+          <div style="margin-top:24px; padding-top:20px; border-top:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong>Test Endpoint Response</strong>
+              <div style="font-size:0.8rem; color:var(--text-muted);">Simulate live API response payload</div>
+            </div>
+            <button class="btn btn-success" onclick="testApiResponse()"><i data-lucide="play" style="width:14px;height:14px;"></i> Execute Test Call</button>
+          </div>
+          <div id="api-response-box" style="display:none; margin-top:14px; background:#07090e; padding:16px; border-radius:var(--radius-md); font-family:var(--font-mono); font-size:0.82rem; color:#10b981; border:1px solid rgba(16,185,129,0.3);"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         7. TEMPLATES / BLUEPRINTS VIEW
+         ========================================================================= -->
+    <section id="view-templates" class="view-section">
+      <div class="container">
+        <div style="text-align:center; margin-bottom:40px;">
+          <span class="eyebrow-badge"><i data-lucide="sparkles" style="width:14px;height:14px;"></i> INDUSTRY BLUEPRINTS</span>
+          <h2 style="font-size:2.4rem; font-weight:900;">Turnkey Solutions for Global Deals</h2>
+          <p style="color:var(--text-secondary); max-width:660px; margin:0 auto;">Pre-configured escrow workflows tailored for source code, 3D media, domains, and AI models.</p>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:24px;">
+          <div class="spotlight-card action-card">
+            <div class="action-card-icon"><i data-lucide="code-2" style="width:26px;height:26px;"></i></div>
+            <h3>SaaS Codebase Handover</h3>
+            <p>Deliver full Next.js/React repositories, Docker configs, and env secrets with automatic buyer payment verification.</p>
+            <button class="btn btn-secondary" onclick="applyTemplate('SaaS Codebase Handover', 'Ethereum', 1.5)">Use Template</button>
+          </div>
+          <div class="spotlight-card action-card">
+            <div class="action-card-icon" style="background:rgba(168,85,247,0.12); color:#a855f7; border-color:rgba(168,85,247,0.25);"><i data-lucide="film" style="width:26px;height:26px;"></i></div>
+            <h3>3D & VFX Master Archives</h3>
+            <p>Transfer multi-gigabyte raw renders, Unreal Engine scenes, and textures with encrypted Supabase storage signed links.</p>
+            <button class="btn btn-secondary" onclick="applyTemplate('3D & VFX Master Archives', 'Solana', 8.5)">Use Template</button>
+          </div>
+          <div class="spotlight-card action-card">
+            <div class="action-card-icon" style="background:rgba(16,185,129,0.12); color:#10b981; border-color:rgba(16,185,129,0.25);"><i data-lucide="globe" style="width:26px;height:26px;"></i></div>
+            <h3>Premium Domain & IP Escrow</h3>
+            <p>Auth code transfer, DNS propagation hold, and atomic crypto settlement with multi-party audit trails.</p>
+            <button class="btn btn-secondary" onclick="applyTemplate('Premium Domain & IP Escrow', 'Base', 2500)">Use Template</button>
+          </div>
+          <div class="spotlight-card action-card">
+            <div class="action-card-icon" style="background:rgba(245,158,11,0.12); color:#fbbf24; border-color:rgba(245,158,11,0.25);"><i data-lucide="cpu" style="width:26px;height:26px;"></i></div>
+            <h3>AI LLM Dataset & Weights</h3>
+            <p>Lock custom PyTorch / GGUF model weights with verified SHA-256 integrity checks prior to release.</p>
+            <button class="btn btn-secondary" onclick="applyTemplate('AI LLM Dataset & Weights', 'Ethereum', 4.2)">Use Template</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         8. PRICING VIEW
+         ========================================================================= -->
+    <section id="view-pricing" class="view-section">
+      <div class="container">
+        <div style="text-align:center; margin-bottom:40px;">
+          <span class="eyebrow-badge"><i data-lucide="percent" style="width:14px;height:14px;"></i> TRANSPARENT RATES</span>
+          <h2 style="font-size:2.4rem; font-weight:900;">Simple, Transparent Protocol Pricing</h2>
+          <p style="color:var(--text-secondary); max-width:660px; margin:0 auto;">Zero monthly fees. Pay only when your digital asset transaction successfully settles.</p>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:28px; max-width:960px; margin:0 auto;">
+          <div class="spotlight-card action-card">
+            <h3>Standard Deal Escrow</h3>
+            <div style="font-size:2.4rem; font-weight:900; color:var(--primary); margin:14px 0;">0.5% <span style="font-size:0.9rem; color:var(--text-muted);">/ settled deal</span></div>
+            <ul style="color:var(--text-secondary); font-size:0.92rem; list-style:none; display:flex; flex-direction:column; gap:10px; margin-bottom:28px;">
+              <li>✓ Unlimited 6-digit room creation</li>
+              <li>✓ Multi-network on-chain verification (7+ chains)</li>
+              <li>✓ AES-256 encrypted Supabase cloud storage</li>
+              <li>✓ Cryptographic Escrow Certificate generation</li>
+              <li>✓ Instant email/in-app notifications</li>
+            </ul>
+            <button class="btn btn-primary btn-lg" style="width:100%;" onclick="showView('send')">Start Escrow Deal</button>
+          </div>
+
+          <div class="spotlight-card action-card" style="border-color:rgba(56,189,248,0.45); box-shadow:0 0 35px rgba(56,189,248,0.2);">
+            <div class="ticker-badge" style="width:fit-content; margin-bottom:12px;">ENTERPRISE CUSTOM</div>
+            <h3>Enterprise Volume</h3>
+            <div style="font-size:2.4rem; font-weight:900; color:#fff; margin:14px 0;">Custom <span style="font-size:0.9rem; color:var(--text-muted);">volume pricing</span></div>
+            <ul style="color:var(--text-secondary); font-size:0.92rem; list-style:none; display:flex; flex-direction:column; gap:10px; margin-bottom:28px;">
+              <li>✓ Custom domain & whitelabel room branding</li>
+              <li>✓ Dedicated multi-GB storage buckets</li>
+              <li>✓ Webhook oracle endpoints & SLA guarantee</li>
+              <li>✓ Multi-signature seller & buyer escrow contracts</li>
+              <li>✓ Dedicated 24/7 keymaster support</li>
+            </ul>
+            <button class="btn btn-secondary btn-lg" style="width:100%;" onclick="showView('support')">Contact Institutional Sales</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         9. SECURITY VIEW
+         ========================================================================= -->
+    <section id="view-security" class="view-section">
+      <div class="container">
+        <div style="text-align:center; margin-bottom:40px;">
+          <span class="eyebrow-badge"><i data-lucide="shield-check" style="width:14px;height:14px;"></i> CIPHER ARCHITECTURE</span>
+          <h2 style="font-size:2.4rem; font-weight:900;">Institutional Grade Security & Custody</h2>
+          <p style="color:var(--text-secondary); max-width:660px; margin:0 auto;">How Vaultdrop protects high-value intellectual property and eliminates counterparty risk.</p>
+        </div>
+
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="action-card-icon"><i data-lucide="lock" style="width:26px;height:26px;"></i></div>
+            <h4>AES-256 Storage Vaults</h4>
+            <p>Files are encrypted in transit and stored in private Supabase Storage buckets governed by strict Row-Level Security policies.</p>
+          </div>
+          <div class="step-card">
+            <div class="action-card-icon" style="background:rgba(16,185,129,0.12); color:#10b981; border-color:rgba(16,185,129,0.25);"><i data-lucide="check-check" style="width:26px;height:26px;"></i></div>
+            <h4>Cryptographic SHA-256 Checksums</h4>
+            <p>Every file is hashed before upload, ensuring that downloaded files exactly match the verified original byte-for-byte.</p>
+          </div>
+          <div class="step-card">
+            <div class="action-card-icon" style="background:rgba(168,85,247,0.12); color:#a855f7; border-color:rgba(168,85,247,0.25);"><i data-lucide="clock" style="width:26px;height:26px;"></i></div>
+            <h4>Time-Expiring Signed URLs</h4>
+            <p>Decrypted file download tokens expire in 60 minutes to prevent unauthorized redistribution of asset download links.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         10. SUPPORT VIEW
+         ========================================================================= -->
+    <section id="view-support" class="view-section">
+      <div class="container">
+        <div class="form-card">
+          <div class="form-header">
+            <h2>Keymaster Escrow Support</h2>
+            <p>Have questions regarding your transfer, room code, or blockchain confirmations?</p>
+          </div>
+
+          <form onsubmit="handleSupportSubmit(event)">
+            <div class="form-group">
+              <label>Your Email Address</label>
+              <input type="email" class="input-text" placeholder="you@company.com" required>
+            </div>
+            <div class="form-group">
+              <label>6-Digit Room Code (If applicable)</label>
+              <input type="text" class="input-text" placeholder="e.g. 849201">
+            </div>
+            <div class="form-group">
+              <label>Inquiry or Dispute Details</label>
+              <textarea class="textarea-input" placeholder="Explain your transaction inquiry..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg" style="width:100%;">
+              <i data-lucide="send" style="width:18px;height:18px;"></i> Submit Priority Ticket
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         Printable Escrow Settlement Certificate Modal
+         ========================================================================= -->
+    <div class="modal-overlay" id="cert-modal">
+      <div class="certificate-box">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; border-bottom:1px solid var(--border-subtle); padding-bottom:16px;">
+          <div>
+            <span class="ticker-badge" style="background:rgba(16,185,129,0.15); color:#10b981; border-color:rgba(16,185,129,0.3);">OFFICIAL SETTLEMENT RECORD</span>
+            <h3 style="font-size:1.6rem; font-weight:900; margin-top:6px;">Certificate of Escrow Settlement</h3>
+          </div>
+          <button style="background:none; border:none; color:var(--text-muted); cursor:pointer;" onclick="closeCertificateModal()"><i data-lucide="x" style="width:22px;height:22px;"></i></button>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:14px; font-size:0.9rem; margin-bottom:24px;">
+          <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">Room Code:</span> <strong id="cert-code" style="font-family:var(--font-mono); color:var(--primary);">#000000</strong></div>
+          <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">Deal Title:</span> <strong id="cert-title">Asset Handover</strong></div>
+          <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">Settlement Amount:</span> <strong id="cert-amount" style="font-family:var(--font-mono); color:var(--accent-emerald);">0.00 ETH</strong></div>
+          <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">Blockchain Network:</span> <strong id="cert-chain">Ethereum Mainnet</strong></div>
+          <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">Custody Provider:</span> <strong>Supabase Private Cloud Vault</strong></div>
+          <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-secondary);">Issued Timestamp:</span> <span id="cert-time" style="font-family:var(--font-mono); color:var(--text-muted);">2026-09-02 12:00:00 UTC</span></div>
+        </div>
+
+        <div style="display:flex; gap:12px; justify-content:flex-end;">
+          <button class="btn btn-secondary" onclick="window.print()"><i data-lucide="printer" style="width:16px;height:16px;"></i> Print / Save PDF</button>
+          <button class="btn btn-primary" onclick="closeCertificateModal()">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================================
+         Floating AI Assistant Chat Widget
+         ========================================================================= -->
+    <button class="chat-widget-btn" onclick="toggleChat()" title="Open AI Escrow Assistant">
+      <i data-lucide="bot" style="width:28px;height:28px;"></i>
+    </button>
+
+    <div class="chat-modal" id="chat-modal">
+      <div class="chat-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="live-dot"></div>
+          <strong>Vaultdrop AI Keymaster</strong>
+        </div>
+        <button style="background:none; border:none; color:var(--text-muted); cursor:pointer;" onclick="toggleChat()"><i data-lucide="x" style="width:20px;height:20px;"></i></button>
+      </div>
+      <div class="chat-body" id="chat-messages">
+        <div class="chat-msg msg-agent">
+          Hello! I am your Vaultdrop Escrow Assistant. Ask me about creating room codes, supported chains, on-chain verification, or custom deal blueprints.
+          <div class="chat-suggestion-chips">
+            <button class="chip-btn" onclick="sendQuickChat('How does escrow work?')">How does escrow work?</button>
+            <button class="chip-btn" onclick="sendQuickChat('Which chains are supported?')">Supported chains?</button>
+            <button class="chip-btn" onclick="sendQuickChat('How do I release files?')">How to release?</button>
+          </div>
+        </div>
+      </div>
+      <div class="chat-footer">
+        <input type="text" id="chat-input" class="input-text" placeholder="Ask a question..." onkeydown="if(event.key==='Enter') sendChatMessage()">
+        <button class="btn btn-primary" onclick="sendChatMessage()"><i data-lucide="send" style="width:16px;height:16px;"></i></button>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast-box">
+      <i data-lucide="check-circle" style="color:#10b981; width:22px;height:22px;"></i>
+      <span id="toast-message">Notification message</span>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container footer-grid">
+        <div>
+          <div class="logo" style="margin-bottom:14px;" onclick="showView('home')">
+            <div class="logo-icon"><i data-lucide="shield-check" style="color:#fff;width:20px;height:20px;"></i></div>
+            <span>Vaultdrop <span class="tag">ENTERPRISE</span></span>
+          </div>
+          <p style="color:var(--text-muted); font-size:0.88rem; max-width:340px; line-height:1.6;">
+            The international digital asset settlement and confidential escrow protocol. Powered by Supabase Cloud Storage and multi-chain cryptographic verification.
+          </p>
+        </div>
+        <div class="footer-col">
+          <h5>Solutions</h5>
+          <ul>
+            <li><a onclick="showView('templates')">SaaS Codebase Handover</a></li>
+            <li><a onclick="showView('templates')">3D & VFX Master Archives</a></li>
+            <li><a onclick="showView('templates')">Domain & IP Escrow</a></li>
+            <li><a onclick="showView('templates')">AI Dataset Weights</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Platform</h5>
+          <ul>
+            <li><a onclick="showView('send')">Send Files & Lock</a></li>
+            <li><a onclick="showView('dashboard')">Transfers Command Center</a></li>
+            <li><a onclick="showView('explorer')">Public Escrow Ledger</a></li>
+            <li><a onclick="showView('developers')">REST API & SDK</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Security</h5>
+          <ul>
+            <li><a onclick="showView('security')">AES-256 Cloud Vault</a></li>
+            <li><a onclick="showView('security')">SHA-256 Checksums</a></li>
+            <li><a onclick="showView('support')">Keymaster Support</a></li>
+            <li><a onclick="showView('pricing')">Protocol Rates</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="container" style="text-align:center; border-top:1px solid var(--border-subtle); padding-top:24px; font-size:0.82rem; color:var(--text-muted);">
+        © 2026 Vaultdrop Global Escrow Cloud. All rights reserved.
+      </div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

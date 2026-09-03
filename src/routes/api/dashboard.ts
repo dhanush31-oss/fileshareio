@@ -21,7 +21,7 @@ export const Route = createFileRoute("/api/dashboard")({
           const roomIds = roomList.map((r) => r.id);
 
           // 2. Fetch proofs for all rooms
-          const { data: proofs, error: proofErr } = roomIds.length
+          const { data: rawProofs, error: proofErr } = roomIds.length
             ? await supabaseAdmin
                 .from("payment_proofs")
                 .select("*")
@@ -29,6 +29,40 @@ export const Route = createFileRoute("/api/dashboard")({
                 .order("created_at", { ascending: false })
             : { data: [], error: null };
           if (proofErr) console.error("[api/dashboard] Proofs fetch error:", proofErr);
+
+          const proofs = await Promise.all(
+            (rawProofs ?? []).map(async (p) => {
+              const hasRealFile = Boolean(
+                p.proof_path &&
+                  !p.proof_path.includes("/tx-") &&
+                  !p.proof_path.startsWith("tx-") &&
+                  p.proof_path.trim() !== "",
+              );
+
+              let proofUrl: string | null = null;
+              if (hasRealFile) {
+                try {
+                  const { data: signed } = await supabaseAdmin.storage
+                    .from("payment-proofs")
+                    .createSignedUrl(p.proof_path, 86400);
+
+                  proofUrl =
+                    signed?.signedUrl ||
+                    supabaseAdmin.storage.from("payment-proofs").getPublicUrl(p.proof_path).data
+                      .publicUrl ||
+                    null;
+                } catch (err) {
+                  console.warn("[api/dashboard] Failed to generate signed url for proof:", err);
+                }
+              }
+
+              return {
+                ...p,
+                has_screenshot: Boolean(hasRealFile && proofUrl),
+                proof_url: proofUrl,
+              };
+            }),
+          );
 
           // 3. Fetch notifications
           const { data: notifs } = await supabaseAdmin
@@ -42,7 +76,7 @@ export const Route = createFileRoute("/api/dashboard")({
               ok: true,
               selling: roomList,
               buying: roomList.filter((r) => r.buyer_id === userId),
-              proofs: proofs ?? [],
+              proofs: proofs,
               notifications: notifs ?? [],
             }),
             {
