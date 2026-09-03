@@ -1,6 +1,6 @@
 import { createFileRoute, useParams, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ensureSession } from "@/lib/session";
 import { AppShell } from "@/components/AppShell";
@@ -108,12 +108,64 @@ function fileToBase64(file: File): Promise<string> {
   });
 }
 
+async function compressImageIfNeeded(file: File): Promise<{ base64: string; mimeType: string }> {
+  if (file.type === "application/pdf") {
+    const base64 = await fileToBase64(file);
+    return { base64, mimeType: "application/pdf" };
+  }
+
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let width = img.width;
+        let height = img.height;
+        const maxDim = 1600;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+          const base64 = dataUrl.split(",")[1];
+          resolve({ base64, mimeType: "image/jpeg" });
+        } else {
+          const res = (e.target?.result as string) || "";
+          resolve({ base64: res.split(",")[1] || "", mimeType: file.type || "image/png" });
+        }
+      };
+      img.onerror = () => {
+        const res = (e.target?.result as string) || "";
+        resolve({ base64: res.split(",")[1] || "", mimeType: file.type || "image/png" });
+      };
+      img.src = (e.target?.result as string) || "";
+    };
+    reader.onerror = () => {
+      resolve({ base64: "", mimeType: file.type || "image/png" });
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 function RoomPage() {
   const { code } = useParams({ from: "/_authenticated/room/$code" });
   const qc = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofPreviewUrl, setProofPreviewUrl] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const [note, setNote] = useState("");
   const [txHash, setTxHash] = useState("");
   const [unlockCode, setUnlockCode] = useState(code || "");
@@ -178,13 +230,31 @@ function RoomPage() {
     if (!room) return;
 
     if (!proofFile) {
-      toast.error("Please upload a payment screenshot / receipt photo");
+      toast.error("Please click the box to upload a payment screenshot / receipt photo");
       return;
     }
 
     setBusy(true);
     try {
-      const proofBase64 = await fileToBase64(proofFile);
+      let proofPath: string | undefined;
+
+      // 1. Try direct upload to Supabase storage bucket
+      try {
+        const safeName = (proofFile.name || "payment-proof.png").replace(/[^\w.\-]+/g, "_");
+        const targetPath = `${room.buyer_id || "buyer"}/${crypto.randomUUID()}-${safeName}`;
+        const { data: upData, error: upErr } = await supabase.storage
+          .from("payment-proofs")
+          .upload(targetPath, proofFile, { upsert: true });
+
+        if (!upErr && upData?.path) {
+          proofPath = upData.path;
+        }
+      } catch (err) {
+        console.warn("Direct storage upload fallback:", err);
+      }
+
+      // 2. Compress image for API payload fallback
+      const { base64: proofBase64, mimeType } = await compressImageIfNeeded(proofFile);
 
       const res = await fetch("/api/room", {
         method: "POST",
@@ -195,8 +265,9 @@ function RoomPage() {
           txHash: txHash.trim(),
           note: note.trim(),
           proofName: proofFile.name,
+          proofPath,
           proofBase64,
-          mimeType: proofFile.type || "image/png",
+          mimeType,
         }),
       });
 
@@ -208,7 +279,7 @@ function RoomPage() {
       if (data.chainVerified) {
         toast.success("Payment verified on-chain! The seller has been notified.");
       } else {
-        toast.success("Payment proof submitted to seller for approval.");
+        toast.success("Payment proof screenshot submitted to seller for approval!");
         if (txHash && data.detail) toast.message(data.detail);
       }
 
@@ -553,58 +624,113 @@ function RoomPage() {
               </Label>
               
               {!proofPreviewUrl ? (
-                <label
-                  htmlFor="proof"
-                  className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-primary/40 bg-primary/5 p-5 text-xs text-muted-foreground hover:border-primary hover:bg-primary/10 transition-all text-center"
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => fileInputRef.current?.click()}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      fileInputRef.current?.click();
+                    }
+                  }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsDragging(true);
+                  }}
+                  onDragLeave={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsDragging(false);
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsDragging(false);
+                    const dropped = e.dataTransfer.files?.[0];
+                    if (dropped) {
+                      setProofFile(dropped);
+                    }
+                  }}
+                  className={`flex cursor-pointer flex-col items-center justify-center gap-2.5 rounded-xl border-2 border-dashed p-6 text-xs transition-all text-center select-none ${
+                    isDragging
+                      ? "border-primary bg-primary/20 scale-[1.01]"
+                      : "border-primary/40 bg-primary/5 hover:border-primary hover:bg-primary/10 shadow-sm"
+                  }`}
                 >
-                  <div className="flex size-10 items-center justify-center rounded-full bg-primary/15 text-primary">
-                    <UploadCloud className="size-5" />
+                  <div className="flex size-11 items-center justify-center rounded-full bg-primary/15 text-primary">
+                    <UploadCloud className="size-6" />
                   </div>
                   <div>
-                    <span className="font-semibold text-foreground">Click to upload payment screenshot</span>
-                    <p className="text-[11px] text-muted-foreground mt-0.5">PNG, JPG, JPEG, WEBP or PDF receipt</p>
+                    <span className="font-semibold text-foreground text-sm">
+                      Click to choose screenshot or drag & drop here
+                    </span>
+                    <p className="text-[11px] text-muted-foreground mt-1">
+                      PNG, JPG, JPEG, WEBP or PDF receipt
+                    </p>
                   </div>
-                </label>
+                </div>
               ) : (
-                <div className="relative rounded-xl border border-primary/40 bg-card p-3 flex items-center justify-between gap-3">
+                <div className="relative rounded-xl border border-primary/40 bg-card p-3.5 flex items-center justify-between gap-3 shadow-sm">
                   <div className="flex items-center gap-3 min-w-0">
                     {proofFile?.type.startsWith("image/") && proofPreviewUrl ? (
                       <img
                         src={proofPreviewUrl}
                         alt="Payment Proof Preview"
-                        className="size-14 rounded-lg object-cover border border-border bg-black/40 shrink-0"
+                        className="size-16 rounded-lg object-cover border border-border bg-black/50 shrink-0"
                       />
                     ) : (
-                      <div className="flex size-14 items-center justify-center rounded-lg bg-primary/10 text-primary shrink-0 border border-primary/20">
-                        <FileImage className="size-6" />
+                      <div className="flex size-16 items-center justify-center rounded-lg bg-primary/10 text-primary shrink-0 border border-primary/20">
+                        <FileImage className="size-7" />
                       </div>
                     )}
                     <div className="min-w-0 text-xs">
-                      <p className="font-semibold text-foreground truncate">{proofFile?.name}</p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">
-                        {proofFile ? formatBytes(proofFile.size) : ""} · Ready for seller review
+                      <p className="font-bold text-foreground truncate text-sm">{proofFile?.name}</p>
+                      <p className="text-[11px] text-emerald-400 font-medium mt-0.5 flex items-center gap-1">
+                        <Check className="size-3" /> Ready for submission ({proofFile ? formatBytes(proofFile.size) : ""})
                       </p>
                     </div>
                   </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setProofFile(null)}
-                    className="text-xs text-destructive hover:bg-destructive/10 shrink-0 h-8 px-2"
-                  >
-                    <X className="size-4 mr-1" /> Remove
-                  </Button>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="text-xs h-8 px-2.5"
+                    >
+                      Change
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setProofFile(null);
+                        if (fileInputRef.current) fileInputRef.current.value = "";
+                      }}
+                      className="text-xs text-destructive hover:bg-destructive/10 h-8 px-2"
+                    >
+                      <X className="size-4" />
+                    </Button>
+                  </div>
                 </div>
               )}
 
               <input
-                id="proof"
+                ref={fileInputRef}
+                id="proof-file-input"
                 type="file"
                 accept="image/*,application/pdf"
                 className="hidden"
-                required
-                onChange={(e) => setProofFile(e.target.files?.[0] ?? null)}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) {
+                    setProofFile(f);
+                  }
+                  e.target.value = "";
+                }}
               />
             </div>
 
