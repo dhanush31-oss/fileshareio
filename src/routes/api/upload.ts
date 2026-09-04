@@ -11,6 +11,33 @@ function generateCode(): string {
   return out;
 }
 
+const SECURITY_HEADERS = {
+  "content-type": "application/json",
+  "x-content-type-options": "nosniff",
+  "x-frame-options": "DENY",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "cache-control": "no-store",
+};
+
+function sanitizeText(input: unknown): string {
+  if (typeof input !== "string") return "";
+  return input
+    .replace(/\0/g, "")
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/[<>]/g, "")
+    .trim();
+}
+
+function sanitizeFileName(name: unknown): string {
+  if (typeof name !== "string" || !name) return "file.bin";
+  // Remove directory traversal, slashes, null bytes, and non-printable characters
+  const clean = name
+    .replace(/\0/g, "")
+    .replace(/[/\\?%*:|"<>]/g, "_")
+    .replace(/\.\.+/g, ".")
+    .trim();
+  return clean.slice(0, 180) || "file.bin";
+}
 
 export const Route = createFileRoute("/api/upload")({
   server: {
@@ -31,30 +58,37 @@ export const Route = createFileRoute("/api/upload")({
             files = [],
           } = body;
 
-          if (!files || !files.length) {
+          if (!files || !Array.isArray(files) || !files.length) {
             return new Response(JSON.stringify({ error: "Please attach at least one file." }), {
               status: 400,
-              headers: { "content-type": "application/json" },
+              headers: SECURITY_HEADERS,
             });
           }
 
-          const resolvedWallet = String(walletAddress || "").trim();
-          if (!resolvedWallet) {
+          const cleanWallet = sanitizeText(walletAddress);
+          if (!cleanWallet) {
             return new Response(
               JSON.stringify({ error: "Receiving wallet address is required." }),
               {
                 status: 400,
-                headers: { "content-type": "application/json" },
+                headers: SECURITY_HEADERS,
               },
             );
           }
 
-          const resolvedCryptoAmount = Number.isFinite(Number(cryptoAmount))
+          const resolvedCryptoAmount = Number.isFinite(Number(cryptoAmount)) && Number(cryptoAmount) >= 0
             ? Number(cryptoAmount)
             : 0;
-          const resolvedPriceAmount = Number.isFinite(Number(priceAmount))
+          const resolvedPriceAmount = Number.isFinite(Number(priceAmount)) && Number(priceAmount) >= 0
             ? Number(priceAmount)
             : resolvedCryptoAmount;
+
+          const cleanTitle = sanitizeText(title);
+          const cleanDescription = sanitizeText(description);
+          const cleanInstructions = sanitizeText(paymentInstructions);
+          const cleanChain = sanitizeText(chain) || "Ethereum";
+          const cleanToken = sanitizeText(tokenSymbol).toUpperCase() || "ETH";
+          const cleanCurrency = sanitizeText(priceCurrency).toUpperCase() || "USD";
 
           // Ensure Supabase storage buckets and valid auth.users seller ID
           await ensureBucketsExist(supabaseAdmin);
@@ -65,7 +99,7 @@ export const Route = createFileRoute("/api/upload")({
             [];
 
           for (const f of files) {
-            const safeName = (f.name || "file.bin").replace(/[^\w.\-]+/g, "_");
+            const safeName = sanitizeFileName(f.name);
             const storagePath = `${userId}/${crypto.randomUUID()}-${safeName}`;
             const buffer = Buffer.from(f.base64 || "", "base64");
 
@@ -140,20 +174,14 @@ export const Route = createFileRoute("/api/upload")({
               .insert({
                 room_code: code,
                 seller_id: userId,
-                title: (title || label).trim().slice(0, 140),
-                description: String(description || "")
-                  .trim()
-                  .slice(0, 2000),
-                payment_instructions: String(paymentInstructions || "")
-                  .trim()
-                  .slice(0, 2000),
+                title: (cleanTitle || label).slice(0, 140),
+                description: cleanDescription.slice(0, 2000),
+                payment_instructions: cleanInstructions.slice(0, 2000),
                 price_amount: resolvedPriceAmount,
-                price_currency: String(priceCurrency || "USD").slice(0, 8),
-                wallet_address: resolvedWallet,
-                chain: String(chain || "Ethereum").slice(0, 40),
-                token_symbol: String(tokenSymbol || "ETH")
-                  .toUpperCase()
-                  .slice(0, 12),
+                price_currency: cleanCurrency.slice(0, 8),
+                wallet_address: cleanWallet.slice(0, 120),
+                chain: cleanChain.slice(0, 40),
+                token_symbol: cleanToken.slice(0, 12),
                 crypto_amount: resolvedCryptoAmount,
                 file_path: primary.path,
                 file_name: label.slice(0, 200),
@@ -239,18 +267,15 @@ export const Route = createFileRoute("/api/upload")({
             }),
             {
               status: 200,
-              headers: { "content-type": "application/json" },
+              headers: SECURITY_HEADERS,
             },
           );
         } catch (err: any) {
-          console.error("[api/upload] Uncaught server error:", err);
-          return new Response(
-            JSON.stringify({ error: err instanceof Error ? err.message : "Internal server error" }),
-            {
-              status: 500,
-              headers: { "content-type": "application/json" },
-            },
-          );
+          console.error("[api/upload] Unexpected error:", err);
+          return new Response(JSON.stringify({ error: err?.message || "Internal server error" }), {
+            status: 500,
+            headers: SECURITY_HEADERS,
+          });
         }
       },
     },

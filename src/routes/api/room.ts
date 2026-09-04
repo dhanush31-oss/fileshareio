@@ -2,6 +2,23 @@ import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { resolveUserId, ensureBucketsExist } from "@/integrations/supabase/auth-helpers.server";
 
+const SECURITY_HEADERS = {
+  "content-type": "application/json",
+  "x-content-type-options": "nosniff",
+  "x-frame-options": "DENY",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "cache-control": "no-store",
+};
+
+function sanitizeText(input: unknown): string {
+  if (typeof input !== "string") return "";
+  return input
+    .replace(/\0/g, "")
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/[<>]/g, "")
+    .trim();
+}
+
 export const Route = createFileRoute("/api/room")({
   server: {
     handlers: {
@@ -10,11 +27,14 @@ export const Route = createFileRoute("/api/room")({
           const url = new URL(request.url);
           const code = (url.searchParams.get("code") || "").trim();
 
-          if (!code) {
-            return new Response(JSON.stringify({ error: "Room code is required" }), {
-              status: 400,
-              headers: { "content-type": "application/json" },
-            });
+          if (!code || !/^[0-9]{6}$/.test(code)) {
+            return new Response(
+              JSON.stringify({ error: "A valid 6-digit room code is required." }),
+              {
+                status: 400,
+                headers: SECURITY_HEADERS,
+              },
+            );
           }
 
           // 1. Fetch the room from Supabase database
@@ -28,7 +48,7 @@ export const Route = createFileRoute("/api/room")({
             console.error("[api/room] Database error:", roomErr);
             return new Response(JSON.stringify({ error: roomErr.message }), {
               status: 500,
-              headers: { "content-type": "application/json" },
+              headers: SECURITY_HEADERS,
             });
           }
 
@@ -39,17 +59,27 @@ export const Route = createFileRoute("/api/room")({
               }),
               {
                 status: 404,
-                headers: { "content-type": "application/json" },
+                headers: SECURITY_HEADERS,
               },
             );
           }
 
           // 2. Fetch associated files from room_files
-          const { data: files } = await supabaseAdmin
+          const isUnlocked = room.status === "approved" || Number(room.crypto_amount) === 0;
+          const { data: rawFiles } = await supabaseAdmin
             .from("room_files")
             .select("id, file_name, file_size, mime_type, file_path")
             .eq("room_id", room.id)
             .order("created_at", { ascending: true });
+
+          // If locked, strip internal storage file_path to prevent unauthorized scraping
+          const files = (rawFiles || []).map((f) => ({
+            id: f.id,
+            file_name: f.file_name,
+            file_size: f.file_size,
+            mime_type: f.mime_type,
+            file_path: isUnlocked ? f.file_path : undefined,
+          }));
 
           // 3. Fetch payment proofs
           const { data: rawProofs } = await supabaseAdmin
@@ -110,7 +140,7 @@ export const Route = createFileRoute("/api/room")({
                 file_name: room.file_name,
                 file_size: room.file_size,
                 mime_type: room.mime_type,
-                file_path: room.file_path,
+                file_path: isUnlocked ? room.file_path : undefined,
                 status: room.status,
                 created_at: room.created_at,
                 seller_id: room.seller_id,
@@ -121,17 +151,14 @@ export const Route = createFileRoute("/api/room")({
             }),
             {
               status: 200,
-              headers: {
-                "content-type": "application/json",
-                "cache-control": "no-store",
-              },
+              headers: SECURITY_HEADERS,
             },
           );
         } catch (err: any) {
           console.error("[api/room] Unexpected GET error:", err);
           return new Response(JSON.stringify({ error: err?.message || "Internal server error" }), {
             status: 500,
-            headers: { "content-type": "application/json" },
+            headers: SECURITY_HEADERS,
           });
         }
       },
@@ -144,7 +171,9 @@ export const Route = createFileRoute("/api/room")({
           // Action 1: Submit payment proof
           if (action === "submit_proof") {
             const { roomId, txHash = "", note = "", proofPath = "", proofName = "" } = body;
-            const cleanTxHash = String(txHash || "").trim();
+            const cleanTxHash = sanitizeText(txHash);
+            const cleanNote = sanitizeText(note).slice(0, 1000);
+            const cleanProofName = sanitizeText(proofName).slice(0, 180);
 
             const { data: room, error: roomErr } = await supabaseAdmin
               .from("rooms")
@@ -155,7 +184,7 @@ export const Route = createFileRoute("/api/room")({
             if (roomErr || !room) {
               return new Response(JSON.stringify({ error: "Room not found" }), {
                 status: 404,
-                headers: { "content-type": "application/json" },
+                headers: SECURITY_HEADERS,
               });
             }
 
@@ -188,7 +217,7 @@ export const Route = createFileRoute("/api/room")({
             let finalProofPath: string | null = null;
 
             if (body.proofBase64) {
-              const safeName = (proofName || "payment-proof.png").replace(/[^\w.\-]+/g, "_");
+              const safeName = (cleanProofName || "payment-proof.png").replace(/[/\\?%*:|"<>]/g, "_");
               finalProofPath = `${buyerId}/${crypto.randomUUID()}-${safeName}`;
               const buffer = Buffer.from(body.proofBase64, "base64");
               const { error: uploadErr } = await supabaseAdmin.storage
@@ -208,10 +237,8 @@ export const Route = createFileRoute("/api/room")({
                 room_id: room.id,
                 buyer_id: buyerId,
                 proof_path: finalProofPath,
-                proof_name: (proofName || (finalProofPath ? "Payment Screenshot" : "Transaction Hash")).slice(0, 200),
-                note: String(note || "")
-                  .trim()
-                  .slice(0, 1000),
+                proof_name: (cleanProofName || (finalProofPath ? "Payment Screenshot" : "Transaction Hash")).slice(0, 200),
+                note: cleanNote,
                 amount_claimed: room.price_amount,
                 tx_hash: cleanTxHash.slice(0, 120),
                 chain_verified: chainVerified,
@@ -224,7 +251,7 @@ export const Route = createFileRoute("/api/room")({
             if (proofErr) {
               return new Response(JSON.stringify({ error: proofErr.message }), {
                 status: 500,
-                headers: { "content-type": "application/json" },
+                headers: SECURITY_HEADERS,
               });
             }
 
@@ -257,7 +284,7 @@ export const Route = createFileRoute("/api/room")({
               }),
               {
                 status: 200,
-                headers: { "content-type": "application/json" },
+                headers: SECURITY_HEADERS,
               },
             );
           }
@@ -266,6 +293,7 @@ export const Route = createFileRoute("/api/room")({
           if (action === "review_proof" || action === "approve_proof" || action === "instant_approve") {
             const { roomId, proofId, approve = true, reviewNote = "" } = body;
             const newStatus = approve ? "approved" : "awaiting_payment";
+            const cleanReviewNote = sanitizeText(reviewNote).slice(0, 1000);
 
             await supabaseAdmin.from("rooms").update({ status: newStatus }).eq("id", roomId);
 
@@ -274,7 +302,7 @@ export const Route = createFileRoute("/api/room")({
                 .from("payment_proofs")
                 .update({
                   status: approve ? "approved" : "rejected",
-                  review_note: String(reviewNote || "").trim(),
+                  review_note: cleanReviewNote,
                   reviewed_at: new Date().toISOString(),
                 })
                 .eq("id", proofId);
@@ -294,14 +322,16 @@ export const Route = createFileRoute("/api/room")({
               JSON.stringify({ ok: true, status: newStatus }),
               {
                 status: 200,
-                headers: { "content-type": "application/json" },
+                headers: SECURITY_HEADERS,
               },
             );
           }
 
-          // Action 2: Get download URLs for unlocked files
+          // Action 3: Get download URLs for unlocked files
           if (action === "unlock_download") {
             const { roomId, code, fileId } = body;
+            const cleanCode = sanitizeText(code);
+
             const { data: room, error: roomErr } = await supabaseAdmin
               .from("rooms")
               .select("*")
@@ -311,7 +341,7 @@ export const Route = createFileRoute("/api/room")({
             if (roomErr || !room) {
               return new Response(JSON.stringify({ error: "Room not found" }), {
                 status: 404,
-                headers: { "content-type": "application/json" },
+                headers: SECURITY_HEADERS,
               });
             }
 
@@ -322,15 +352,15 @@ export const Route = createFileRoute("/api/room")({
                 }),
                 {
                   status: 403,
-                  headers: { "content-type": "application/json" },
+                  headers: SECURITY_HEADERS,
                 },
               );
             }
 
-            if (String(code || "").trim() !== room.room_code) {
+            if (cleanCode !== room.room_code) {
               return new Response(JSON.stringify({ error: "Incorrect room code." }), {
                 status: 403,
-                headers: { "content-type": "application/json" },
+                headers: SECURITY_HEADERS,
               });
             }
 
@@ -365,19 +395,19 @@ export const Route = createFileRoute("/api/room")({
 
             return new Response(JSON.stringify({ ok: true, files }), {
               status: 200,
-              headers: { "content-type": "application/json" },
+              headers: SECURITY_HEADERS,
             });
           }
 
           return new Response(JSON.stringify({ error: "Unknown action" }), {
             status: 400,
-            headers: { "content-type": "application/json" },
+            headers: SECURITY_HEADERS,
           });
         } catch (err: any) {
           console.error("[api/room] Unexpected POST error:", err);
           return new Response(JSON.stringify({ error: err?.message || "Internal server error" }), {
             status: 500,
-            headers: { "content-type": "application/json" },
+            headers: SECURITY_HEADERS,
           });
         }
       },

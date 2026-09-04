@@ -624,16 +624,8 @@ function RoomPage() {
               </Label>
               
               {!proofPreviewUrl ? (
-                <div
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => fileInputRef.current?.click()}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      fileInputRef.current?.click();
-                    }
-                  }}
+                <label
+                  htmlFor="proof-file-input"
                   onDragOver={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -659,10 +651,10 @@ function RoomPage() {
                       : "border-primary/40 bg-primary/5 hover:border-primary hover:bg-primary/10 shadow-sm"
                   }`}
                 >
-                  <div className="flex size-11 items-center justify-center rounded-full bg-primary/15 text-primary">
+                  <div className="flex size-11 items-center justify-center rounded-full bg-primary/15 text-primary pointer-events-none">
                     <UploadCloud className="size-6" />
                   </div>
-                  <div>
+                  <div className="pointer-events-none">
                     <span className="font-semibold text-foreground text-sm">
                       Click to choose screenshot or drag & drop here
                     </span>
@@ -670,7 +662,22 @@ function RoomPage() {
                       PNG, JPG, JPEG, WEBP or PDF receipt
                     </p>
                   </div>
-                </div>
+                  <input
+                    id="proof-file-input"
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*,application/pdf"
+                    className="sr-only"
+                    tabIndex={-1}
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) {
+                        setProofFile(f);
+                      }
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
               ) : (
                 <div className="relative rounded-xl border border-primary/40 bg-card p-3.5 flex items-center justify-between gap-3 shadow-sm">
                   <div className="flex items-center gap-3 min-w-0">
@@ -715,23 +722,24 @@ function RoomPage() {
                       <X className="size-4" />
                     </Button>
                   </div>
+
+                  <input
+                    id="proof-file-input"
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*,application/pdf"
+                    className="sr-only"
+                    tabIndex={-1}
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) {
+                        setProofFile(f);
+                      }
+                      e.target.value = "";
+                    }}
+                  />
                 </div>
               )}
-
-              <input
-                ref={fileInputRef}
-                id="proof-file-input"
-                type="file"
-                accept="image/*,application/pdf"
-                className="hidden"
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) {
-                    setProofFile(f);
-                  }
-                  e.target.value = "";
-                }}
-              />
             </div>
 
             <div className="space-y-1.5">
