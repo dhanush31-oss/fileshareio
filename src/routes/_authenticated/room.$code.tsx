@@ -624,8 +624,7 @@ function RoomPage() {
               </Label>
               
               {!proofPreviewUrl ? (
-                <label
-                  htmlFor="proof-file-input"
+                <div
                   onDragOver={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -645,12 +644,28 @@ function RoomPage() {
                       setProofFile(dropped);
                     }
                   }}
-                  className={`flex cursor-pointer flex-col items-center justify-center gap-2.5 rounded-xl border-2 border-dashed p-6 text-xs transition-all text-center select-none ${
+                  className={`relative flex cursor-pointer flex-col items-center justify-center gap-2.5 rounded-xl border-2 border-dashed p-6 text-xs transition-all text-center select-none ${
                     isDragging
                       ? "border-primary bg-primary/20 scale-[1.01]"
                       : "border-primary/40 bg-primary/5 hover:border-primary hover:bg-primary/10 shadow-sm"
                   }`}
                 >
+                  {/* Native transparent input overlay covering entire box */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*,application/pdf"
+                    aria-label="Upload payment screenshot"
+                    className="absolute inset-0 h-full w-full opacity-0 cursor-pointer z-20"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) {
+                        setProofFile(f);
+                      }
+                      e.target.value = "";
+                    }}
+                  />
+
                   <div className="flex size-11 items-center justify-center rounded-full bg-primary/15 text-primary pointer-events-none">
                     <UploadCloud className="size-6" />
                   </div>
@@ -662,22 +677,7 @@ function RoomPage() {
                       PNG, JPG, JPEG, WEBP or PDF receipt
                     </p>
                   </div>
-                  <input
-                    id="proof-file-input"
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*,application/pdf"
-                    className="sr-only"
-                    tabIndex={-1}
-                    onChange={(e) => {
-                      const f = e.target.files?.[0];
-                      if (f) {
-                        setProofFile(f);
-                      }
-                      e.target.value = "";
-                    }}
-                  />
-                </label>
+                </div>
               ) : (
                 <div className="relative rounded-xl border border-primary/40 bg-card p-3.5 flex items-center justify-between gap-3 shadow-sm">
                   <div className="flex items-center gap-3 min-w-0">

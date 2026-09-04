@@ -149,7 +149,6 @@ function SendPage() {
   const [files, setFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const folderInputRef = useRef<HTMLInputElement>(null);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -473,8 +472,7 @@ function SendPage() {
               )}
             </Label>
 
-            <label
-              htmlFor="escrow-file-input"
+            <div
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
@@ -484,6 +482,19 @@ function SendPage() {
                   : "border-border/80 bg-muted/20 hover:border-primary/60 hover:bg-muted/40"
               }`}
             >
+              {/* Native transparent input overlay covering entire box */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                aria-label="Upload files"
+                className="absolute inset-0 h-full w-full opacity-0 cursor-pointer z-20"
+                onChange={(e) => {
+                  addFiles(e.target.files);
+                  e.target.value = "";
+                }}
+              />
+
               <div className="flex size-11 items-center justify-center rounded-full bg-primary/10 text-primary pointer-events-none">
                 <UploadCloud className="size-6" />
               </div>
@@ -492,84 +503,23 @@ function SendPage() {
                   Click to browse or drag & drop files
                 </p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Documents, code, images, archives — select multiple files or folders
+                  Documents, code, images, archives — select multiple files
                 </p>
               </div>
-
-              {/* Action buttons inside the dropzone */}
-              <div className="mt-1 flex flex-wrap items-center justify-center gap-2">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    fileInputRef.current?.click();
-                  }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/20 transition-colors"
-                >
-                  <File className="size-3.5" /> Choose Files
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    folderInputRef.current?.click();
-                  }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-foreground border border-border/80 text-xs font-semibold hover:bg-muted/80 transition-colors"
-                >
-                  <FolderLock className="size-3.5" /> Choose Folder
-                </button>
-              </div>
-
-              <input
-                id="escrow-file-input"
-                ref={fileInputRef}
-                type="file"
-                multiple
-                className="sr-only"
-                tabIndex={-1}
-                onChange={(e) => {
-                  addFiles(e.target.files);
-                  e.target.value = "";
-                }}
-              />
-              <input
-                id="escrow-folder-input"
-                ref={folderInputRef}
-                type="file"
-                multiple
-                {...({ webkitdirectory: "", directory: "" } as any)}
-                className="sr-only"
-                tabIndex={-1}
-                onChange={(e) => {
-                  addFiles(e.target.files);
-                  e.target.value = "";
-                }}
-              />
-            </label>
+            </div>
 
             {/* Selected File List */}
             {files.length > 0 && (
               <div className="space-y-2 pt-2">
                 <div className="flex items-center justify-between text-xs text-muted-foreground px-1">
                   <span>Selected files ({files.length})</span>
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => folderInputRef.current?.click()}
-                      className="flex items-center gap-1 text-muted-foreground hover:text-foreground font-medium"
-                    >
-                      <FolderLock className="size-3" /> Add folder
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="flex items-center gap-1 text-primary hover:underline font-medium"
-                    >
-                      <Plus className="size-3" /> Add files
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex items-center gap-1 text-primary hover:underline font-medium text-xs"
+                  >
+                    <Plus className="size-3" /> Add more
+                  </button>
                 </div>
 
                 <ul className="max-h-48 overflow-y-auto space-y-1.5 pr-1">
