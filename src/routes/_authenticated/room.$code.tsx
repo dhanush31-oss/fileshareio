@@ -184,6 +184,56 @@ function RoomPage() {
     }
   }, [proofFile]);
 
+  async function openProofPicker(e?: React.MouseEvent) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    // 1. Modern Window File System Access API
+    if (typeof window !== "undefined" && typeof (window as any).showOpenFilePicker === "function") {
+      try {
+        const handles = await (window as any).showOpenFilePicker({
+          multiple: false,
+          types: [
+            {
+              description: "Images & Receipts",
+              accept: {
+                "image/*": [".png", ".gif", ".jpeg", ".jpg", ".webp", ".svg"],
+                "application/pdf": [".pdf"],
+              },
+            },
+          ],
+        });
+        if (handles && handles.length > 0) {
+          const file = await handles[0].getFile();
+          if (file) {
+            setProofFile(file);
+            return;
+          }
+        }
+      } catch (err: any) {
+        if (err.name === "AbortError") return;
+        console.warn("Proof showOpenFilePicker fallback:", err);
+      }
+    }
+
+    // 2. Fallback: native file input click
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+      fileInputRef.current.click();
+    } else {
+      const temp = document.createElement("input");
+      temp.type = "file";
+      temp.accept = "image/*,application/pdf";
+      temp.onchange = (ev: any) => {
+        const f = ev.target.files?.[0];
+        if (f) setProofFile(f);
+      };
+      temp.click();
+    }
+  }
+
   useEffect(() => {
     ensureSession();
 
@@ -625,6 +675,15 @@ function RoomPage() {
               
               {!proofPreviewUrl ? (
                 <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={openProofPicker}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      openProofPicker();
+                    }
+                  }}
                   onDragOver={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -650,13 +709,11 @@ function RoomPage() {
                       : "border-primary/40 bg-primary/5 hover:border-primary hover:bg-primary/10 shadow-sm"
                   }`}
                 >
-                  {/* Native transparent input overlay covering entire box */}
                   <input
                     ref={fileInputRef}
                     type="file"
                     accept="image/*,application/pdf"
-                    aria-label="Upload payment screenshot"
-                    className="absolute inset-0 h-full w-full opacity-0 cursor-pointer z-20"
+                    style={{ display: "none" }}
                     onChange={(e) => {
                       const f = e.target.files?.[0];
                       if (f) {

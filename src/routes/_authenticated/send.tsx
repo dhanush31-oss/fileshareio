@@ -218,6 +218,58 @@ function SendPage() {
     addFiles(e.dataTransfer.files);
   }
 
+  async function openFilePicker(e?: React.MouseEvent) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    // 1. Modern Window File System Access API (Native macOS Finder / Windows Explorer)
+    if (typeof window !== "undefined" && typeof (window as any).showOpenFilePicker === "function") {
+      try {
+        const handles = await (window as any).showOpenFilePicker({
+          multiple: true,
+        });
+        const pickedFiles: File[] = [];
+        for (const handle of handles) {
+          if (handle.kind === "file") {
+            const file = await handle.getFile();
+            pickedFiles.push(file);
+          }
+        }
+        if (pickedFiles.length > 0) {
+          setFiles((prev) => {
+            const merged = [...prev];
+            for (const f of pickedFiles) {
+              if (!merged.some((m) => m.name === f.name && m.size === f.size)) {
+                merged.push(f);
+              }
+            }
+            return merged;
+          });
+          return;
+        }
+      } catch (err: any) {
+        if (err.name === "AbortError") return;
+        console.warn("showOpenFilePicker notice:", err);
+      }
+    }
+
+    // 2. Fallback: Native HTML input click
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+      fileInputRef.current.click();
+    } else {
+      const temp = document.createElement("input");
+      temp.type = "file";
+      temp.multiple = true;
+      temp.onchange = (ev: any) => {
+        addFiles(ev.target.files);
+      };
+      temp.click();
+    }
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
 
@@ -473,6 +525,15 @@ function SendPage() {
             </Label>
 
             <div
+              role="button"
+              tabIndex={0}
+              onClick={openFilePicker}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  openFilePicker();
+                }
+              }}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
@@ -482,13 +543,11 @@ function SendPage() {
                   : "border-border/80 bg-muted/20 hover:border-primary/60 hover:bg-muted/40"
               }`}
             >
-              {/* Native transparent input overlay covering entire box */}
               <input
                 ref={fileInputRef}
                 type="file"
                 multiple
-                aria-label="Upload files"
-                className="absolute inset-0 h-full w-full opacity-0 cursor-pointer z-20"
+                style={{ display: "none" }}
                 onChange={(e) => {
                   addFiles(e.target.files);
                   e.target.value = "";
