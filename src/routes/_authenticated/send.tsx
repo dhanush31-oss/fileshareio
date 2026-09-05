@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +33,18 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/send")({
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      template: typeof search.template === "string" ? search.template : undefined,
+      title: typeof search.title === "string" ? search.title : undefined,
+      price: typeof search.price === "string" ? search.price : undefined,
+      currency: typeof search.currency === "string" ? search.currency : undefined,
+      chain: typeof search.chain === "string" ? search.chain : undefined,
+      token: typeof search.token === "string" ? search.token : undefined,
+      instructions: typeof search.instructions === "string" ? search.instructions : undefined,
+      description: typeof search.description === "string" ? search.description : undefined,
+    };
+  },
   head: () => ({
     meta: [
       { title: "Send Files Securely | Vaultdrop" },
@@ -146,6 +159,7 @@ function getWalletBadge(address: string) {
 }
 
 function SendPage() {
+  const search = Route.useSearch();
   const [files, setFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -168,14 +182,13 @@ function SendPage() {
   const [activeTemplateName, setActiveTemplateName] = useState<string | null>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const urlParams = new URLSearchParams(window.location.search);
-    const templateId = urlParams.get("template");
-    const pTitle = urlParams.get("title");
-    const pPrice = urlParams.get("price");
-    const pCurrency = urlParams.get("currency");
-    const pInstructions = urlParams.get("instructions");
-    const pDescription = urlParams.get("description");
+    const urlParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+    const templateId = search.template || urlParams?.get("template");
+    const pTitle = search.title || urlParams?.get("title");
+    const pPrice = search.price || urlParams?.get("price");
+    const pCurrency = search.currency || urlParams?.get("currency");
+    const pInstructions = search.instructions || urlParams?.get("instructions");
+    const pDescription = search.description || urlParams?.get("description");
 
     if (pTitle) setTitle(pTitle);
     if (pPrice) setTotalAmount(pPrice);
@@ -186,7 +199,7 @@ function SendPage() {
       setActiveTemplateName(pTitle || "Custom Industry Template");
       toast.success("Loaded template parameters into escrow creator");
     }
-  }, []);
+  }, [search]);
 
   const totalSize = files.reduce((sum, f) => sum + f.size, 0);
 
@@ -294,8 +307,13 @@ function SendPage() {
     toast.loading("Encrypting files & storing in Supabase...", { id: "escrow-upload" });
 
     try {
-      const serializedFiles: { name: string; base64: string; size: number; mimeType: string }[] =
-        [];
+      const serializedFiles: {
+        name: string;
+        path?: string;
+        base64?: string;
+        size: number;
+        mimeType: string;
+      }[] = [];
       const totalCount = files.length;
 
       for (let i = 0; i < totalCount; i++) {
@@ -303,13 +321,37 @@ function SendPage() {
         if (!file) continue;
         setUploadProgress(Math.round(((i + 0.5) / totalCount) * 50) + 15);
 
-        const base64 = await fileToBase64(file);
-        serializedFiles.push({
-          name: file.name,
-          base64,
-          size: file.size,
-          mimeType: file.type || "application/octet-stream",
-        });
+        let directPath: string | null = null;
+        try {
+          const safeName = file.name.replace(/[^\w.\-]+/g, "_");
+          const targetPath = `escrow/${crypto.randomUUID()}-${safeName}`;
+          const { data: upData, error: upErr } = await supabase.storage
+            .from("escrow-files")
+            .upload(targetPath, file, { upsert: true });
+
+          if (!upErr && upData?.path) {
+            directPath = upData.path;
+          }
+        } catch (e) {
+          console.warn("[SendPage] Direct storage upload fallback:", e);
+        }
+
+        if (directPath) {
+          serializedFiles.push({
+            name: file.name,
+            path: directPath,
+            size: file.size,
+            mimeType: file.type || "application/octet-stream",
+          });
+        } else {
+          const base64 = await fileToBase64(file);
+          serializedFiles.push({
+            name: file.name,
+            base64,
+            size: file.size,
+            mimeType: file.type || "application/octet-stream",
+          });
+        }
 
         setUploadProgress(Math.round(((i + 1) / totalCount) * 50) + 20);
       }
@@ -327,9 +369,15 @@ function SendPage() {
       }, 300);
 
       try {
+        const headers: Record<string, string> = { "Content-Type": "application/json" };
+        const { data: authData } = await supabase.auth.getSession();
+        if (authData?.session?.access_token) {
+          headers["Authorization"] = `Bearer ${authData.session.access_token}`;
+        }
+
         const res = await fetch("/api/upload", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers,
           body: JSON.stringify({
             title: effectiveTitle,
             description: description.trim(),

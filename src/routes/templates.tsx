@@ -303,40 +303,39 @@ function TemplatesPage() {
   });
 
   const handleUseTemplate = (tpl: EscrowTemplate) => {
-    // Navigate to send page with pre-filled state
-    const params = new URLSearchParams({
-      template: tpl.id,
-      title: tpl.title,
-      price: tpl.suggestedPrice.replace(/,/g, ""),
-      currency: tpl.suggestedCurrency,
-      chain: tpl.suggestedChain,
-      token: tpl.tokenSymbol,
-      instructions: tpl.sampleInstructions,
-      description: `${tpl.summary}\n\nDeliverable Checklist:\n${tpl.checklist.map((c) => `- ${c}`).join("\n")}`,
+    navigate({
+      to: "/send",
+      search: {
+        template: tpl.id,
+        title: tpl.title,
+        price: tpl.suggestedPrice.replace(/,/g, ""),
+        currency: tpl.suggestedCurrency,
+        chain: tpl.suggestedChain,
+        token: tpl.tokenSymbol,
+        instructions: tpl.sampleInstructions,
+        description: `${tpl.summary}\n\nDeliverable Checklist:\n${tpl.checklist.map((c) => `- ${c}`).join("\n")}`,
+      },
     });
-    if (typeof window !== "undefined") {
-      window.location.href = `/send?${params.toString()}`;
-    }
   };
 
   return (
     <AppShell>
       {/* Header Banner */}
-      <div className="text-center max-w-3xl mx-auto space-y-4">
+      <div className="text-center max-w-3xl mx-auto space-y-3 sm:space-y-4 px-2">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-bold uppercase tracking-wider">
           <Layers className="size-3.5" /> Turnkey Industry Escrow Blueprints
         </div>
-        <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground">
+        <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground leading-tight">
           Ready-to-Use Escrow Templates for International Deals
         </h1>
-        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+        <p className="text-xs sm:text-sm md:text-base text-muted-foreground leading-relaxed max-w-2xl mx-auto">
           Launch secure, legally sound digital asset escrows in under 60 seconds. Pre-configured
           with deliverable checklists, milestone rules, and cryptographic verification standards.
         </p>
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4 bg-card/60 p-3 rounded-2xl border border-border/80 shadow-md">
+      <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 bg-card/60 p-3 rounded-2xl border border-border/80 shadow-md">
         {/* Category Tabs */}
         <div className="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
           {[
@@ -379,19 +378,19 @@ function TemplatesPage() {
       </div>
 
       {/* Templates Grid */}
-      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-6 sm:mt-8 grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.map((tpl) => {
           const Icon = tpl.icon;
           return (
             <div
               key={tpl.id}
-              className="group surface-panel p-6 rounded-2xl border border-border/80 hover:border-primary/50 transition-all duration-200 flex flex-col justify-between hover:shadow-xl hover:shadow-primary/5 relative"
+              className="group surface-panel p-4 sm:p-6 rounded-2xl border border-border/80 hover:border-primary/50 transition-all duration-200 flex flex-col justify-between hover:shadow-xl hover:shadow-primary/5 relative"
             >
               <div>
                 {/* Header Top */}
-                <div className="flex items-center justify-between gap-2 mb-4">
-                  <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 group-hover:scale-105 transition-transform">
-                    <Icon className="size-5" />
+                <div className="flex items-center justify-between gap-2 mb-3 sm:mb-4">
+                  <span className="flex size-9 sm:size-10 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 group-hover:scale-105 transition-transform">
+                    <Icon className="size-4 sm:size-5" />
                   </span>
                   <span
                     className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${tpl.badgeColor}`}
@@ -400,21 +399,23 @@ function TemplatesPage() {
                   </span>
                 </div>
 
-                <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors leading-snug">
+                <h3 className="text-base sm:text-lg font-bold text-foreground group-hover:text-primary transition-colors leading-snug">
                   {tpl.title}
                 </h3>
-                <p className="mt-2 text-xs text-muted-foreground leading-relaxed">{tpl.summary}</p>
+                <p className="mt-1.5 sm:mt-2 text-xs text-muted-foreground leading-relaxed">
+                  {tpl.summary}
+                </p>
 
                 {/* Checklist Preview */}
-                <div className="mt-4 pt-4 border-t border-border/60 space-y-2">
+                <div className="mt-3.5 sm:mt-4 pt-3.5 sm:pt-4 border-t border-border/60 space-y-2">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                     Included Deliverables:
                   </p>
-                  <ul className="space-y-1 text-xs text-foreground/90">
+                  <ul className="space-y-1.5 text-xs text-foreground/90">
                     {tpl.checklist.slice(0, 3).map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-1.5">
+                      <li key={idx} className="flex items-start gap-2">
                         <CheckCircle2 className="size-3.5 text-emerald-400 shrink-0 mt-0.5" />
-                        <span className="truncate">{item}</span>
+                        <span className="flex-1 break-words leading-snug">{item}</span>
                       </li>
                     ))}
                     {tpl.checklist.length > 3 && (
@@ -427,19 +428,19 @@ function TemplatesPage() {
               </div>
 
               {/* Bottom Actions */}
-              <div className="mt-6 pt-4 border-t border-border/60 flex items-center gap-2">
+              <div className="mt-5 sm:mt-6 pt-3.5 sm:pt-4 border-t border-border/60 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => setPreviewTemplate(tpl)}
-                  className="flex-1 text-xs font-semibold border-border/80 hover:bg-muted"
+                  className="w-full sm:flex-1 text-xs font-semibold border-border/80 hover:bg-muted h-9"
                 >
                   <Eye className="size-3.5 mr-1" /> Inspect Terms
                 </Button>
                 <Button
                   size="sm"
                   onClick={() => handleUseTemplate(tpl)}
-                  className="flex-1 text-xs font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
+                  className="w-full sm:flex-1 text-xs font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm h-9"
                 >
                   Use Template <ArrowRight className="size-3.5 ml-1" />
                 </Button>

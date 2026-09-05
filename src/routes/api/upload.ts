@@ -100,6 +100,18 @@ export const Route = createFileRoute("/api/upload")({
 
           for (const f of files) {
             const safeName = sanitizeFileName(f.name);
+
+            // If file was already uploaded directly to Supabase storage on the client side
+            if (f.path && typeof f.path === "string") {
+              uploadedFiles.push({
+                path: f.path,
+                name: safeName,
+                size: Number(f.size) || 0,
+                mimeType: f.mimeType || "application/octet-stream",
+              });
+              continue;
+            }
+
             const storagePath = `${userId}/${crypto.randomUUID()}-${safeName}`;
             const buffer = Buffer.from(f.base64 || "", "base64");
 
@@ -139,14 +151,14 @@ export const Route = createFileRoute("/api/upload")({
                 JSON.stringify({ error: `Storage upload failed: ${uploadErr.message}` }),
                 {
                   status: 500,
-                  headers: { "content-type": "application/json" },
+                  headers: SECURITY_HEADERS,
                 },
               );
             }
 
             uploadedFiles.push({
               path: storagePath,
-              name: f.name || "file.bin",
+              name: safeName,
               size: buffer.length || f.size || 0,
               mimeType: f.mimeType || "application/octet-stream",
             });
