@@ -94,60 +94,58 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* Main Header */}
       <header className="sticky top-0 z-40 border-b border-border/70 bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 py-3 gap-3 sm:gap-4 w-full">
-          {/* Logo & Brand */}
-          <div className="flex items-center gap-4 lg:gap-6 shrink-0">
-            <Link to="/" className="shrink-0">
-              <VaultdropLogo size={36} />
+          {/* Left: Logo & Brand */}
+          <Link to="/" className="shrink-0 flex items-center gap-2">
+            <VaultdropLogo size={36} />
+          </Link>
+
+          {/* Center: Desktop Navigation Links (Centered in header) */}
+          <nav className="hidden lg:flex items-center gap-1 text-xs font-medium text-muted-foreground mx-auto">
+            <Link
+              to="/templates"
+              activeProps={{ className: "text-foreground bg-muted font-semibold shadow-sm" }}
+              className="px-3 py-1.5 rounded-lg hover:text-foreground hover:bg-muted/50 transition-colors flex items-center gap-1.5 shrink-0"
+            >
+              <Layers className="size-3.5" /> Templates
             </Link>
+            <Link
+              to="/explorer"
+              activeProps={{ className: "text-foreground bg-muted font-semibold shadow-sm" }}
+              className="px-3 py-1.5 rounded-lg hover:text-foreground hover:bg-muted/50 transition-colors flex items-center gap-1.5 shrink-0"
+            >
+              <Compass className="size-3.5" /> Explorer
+            </Link>
+            <Link
+              to="/security"
+              activeProps={{ className: "text-foreground bg-muted font-semibold shadow-sm" }}
+              className="px-3 py-1.5 rounded-lg hover:text-foreground hover:bg-muted/50 transition-colors flex items-center gap-1.5 shrink-0"
+            >
+              <ShieldCheck className="size-3.5" /> Security
+            </Link>
+            <Link
+              to="/pricing"
+              activeProps={{ className: "text-foreground bg-muted font-semibold shadow-sm" }}
+              className="px-3 py-1.5 rounded-lg hover:text-foreground hover:bg-muted/50 transition-colors flex items-center gap-1.5 shrink-0"
+            >
+              <Percent className="size-3.5" /> Pricing
+            </Link>
+            <Link
+              to="/support"
+              activeProps={{ className: "text-foreground bg-muted font-semibold shadow-sm" }}
+              className="px-3 py-1.5 rounded-lg hover:text-foreground hover:bg-muted/50 transition-colors flex items-center gap-1.5 shrink-0"
+            >
+              <MessageSquareText className="size-3.5" /> Support
+            </Link>
+          </nav>
 
-            {/* Desktop Navigation Links (Responsive on xl+) */}
-            <nav className="hidden xl:flex items-center gap-1 text-xs font-medium text-muted-foreground">
-              <Link
-                to="/templates"
-                activeProps={{ className: "text-foreground bg-muted font-semibold" }}
-                className="px-3 py-1.5 rounded-lg hover:text-foreground hover:bg-muted/50 transition-colors flex items-center gap-1.5 shrink-0"
-              >
-                <Layers className="size-3.5" /> Templates
-              </Link>
-              <Link
-                to="/explorer"
-                activeProps={{ className: "text-foreground bg-muted font-semibold" }}
-                className="px-3 py-1.5 rounded-lg hover:text-foreground hover:bg-muted/50 transition-colors flex items-center gap-1.5 shrink-0"
-              >
-                <Compass className="size-3.5" /> Explorer
-              </Link>
-              <Link
-                to="/security"
-                activeProps={{ className: "text-foreground bg-muted font-semibold" }}
-                className="px-3 py-1.5 rounded-lg hover:text-foreground hover:bg-muted/50 transition-colors flex items-center gap-1.5 shrink-0"
-              >
-                <ShieldCheck className="size-3.5" /> Security
-              </Link>
-              <Link
-                to="/pricing"
-                activeProps={{ className: "text-foreground bg-muted font-semibold" }}
-                className="px-3 py-1.5 rounded-lg hover:text-foreground hover:bg-muted/50 transition-colors flex items-center gap-1.5 shrink-0"
-              >
-                <Percent className="size-3.5" /> Pricing
-              </Link>
-              <Link
-                to="/support"
-                activeProps={{ className: "text-foreground bg-muted font-semibold" }}
-                className="px-3 py-1.5 rounded-lg hover:text-foreground hover:bg-muted/50 transition-colors flex items-center gap-1.5 shrink-0"
-              >
-                <MessageSquareText className="size-3.5" /> Support
-              </Link>
-            </nav>
-          </div>
-
-          {/* Right Action Bar (Never clipped, always aligned) */}
-          <div className="flex items-center gap-2 sm:gap-2.5 md:gap-3 shrink-0 ml-auto">
-            {/* Quick 6-Digit Code Unlock Form (Shown on wide screens) */}
+          {/* Right Action Bar: Enter Code + Language + My Transfers + Send Files */}
+          <div className="flex items-center gap-2 sm:gap-2.5 md:gap-3 shrink-0 ml-auto lg:ml-0">
+            {/* Quick 6-Digit Room Code Unlock Form (Between Support & EN Language) */}
             <form
               onSubmit={handleJoin}
-              className="hidden 2xl:flex items-center gap-1.5 bg-muted/40 px-2 py-1 rounded-xl border border-border/80 focus-within:border-primary/60 transition-colors shadow-inner shrink-0"
+              className="hidden md:flex items-center gap-1.5 bg-muted/40 hover:bg-muted/60 px-2.5 py-1 rounded-xl border border-border/80 focus-within:border-primary/60 focus-within:ring-1 focus-within:ring-primary/40 transition-all shadow-inner shrink-0"
             >
-              <KeyRound className="size-3.5 text-muted-foreground ml-1" />
+              <KeyRound className="size-3.5 text-primary shrink-0" />
               <Input
                 value={quickCode}
                 onChange={(e) => {
@@ -158,17 +156,17 @@ export function AppShell({ children }: { children: ReactNode }) {
                     setQuickCode("");
                   }
                 }}
-                placeholder="6-digit code"
-                className="h-7 w-24 text-center text-xs font-mono tracking-widest bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0"
+                placeholder="Enter 6-digit code"
+                className="h-7 w-28 text-center text-xs font-mono font-medium tracking-wider bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 placeholder:text-muted-foreground/70"
               />
               <Button
                 type="submit"
                 size="sm"
                 variant="ghost"
-                className="h-7 px-2.5 text-xs font-bold hover:bg-primary hover:text-primary-foreground transition-all rounded-lg"
+                className="h-7 px-2 text-xs font-bold hover:bg-primary hover:text-primary-foreground transition-all rounded-lg"
                 disabled={quickCode.length !== 6}
               >
-                Unlock
+                Join
               </Button>
             </form>
 
@@ -177,11 +175,11 @@ export function AppShell({ children }: { children: ReactNode }) {
               <button
                 type="button"
                 onClick={() => setShowLangMenu(!showLangMenu)}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-border/70 bg-card/60 hover:bg-muted text-xs font-medium text-foreground transition-colors shrink-0"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border/70 bg-card/60 hover:bg-muted text-xs font-medium text-foreground transition-colors shrink-0"
                 title="Select International Language"
               >
                 <span className="text-sm">{activeLocaleObj.flag}</span>
-                <span className="hidden sm:inline font-mono text-[11px]">
+                <span className="font-mono text-[11px] font-semibold">
                   {activeLocaleObj.code}
                 </span>
               </button>
@@ -228,7 +226,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </Link>
             </Button>
 
-            {/* Send Files CTA (Guaranteed no-shrink, perfectly aligned) */}
+            {/* Send Files CTA */}
             <Button
               asChild
               size="sm"
@@ -240,13 +238,13 @@ export function AppShell({ children }: { children: ReactNode }) {
               </Link>
             </Button>
 
-            {/* Mobile / Tablet Menu Toggle Button (Shows on < xl) */}
+            {/* Mobile / Tablet Menu Toggle Button (Shows on < lg) */}
             <Button
               type="button"
               variant="ghost"
               size="sm"
               onClick={() => setShowMobileNav(!showMobileNav)}
-              className="xl:hidden h-8.5 w-8.5 p-0 shrink-0"
+              className="lg:hidden h-8.5 w-8.5 p-0 shrink-0"
             >
               {showMobileNav ? <X className="size-5" /> : <Menu className="size-5" />}
             </Button>
@@ -255,7 +253,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
         {/* Mobile / Tablet Navigation Drawer */}
         {showMobileNav && (
-          <div className="xl:hidden border-t border-border bg-card/95 backdrop-blur-xl px-4 sm:px-6 py-4 space-y-4 animate-in slide-in-from-top-2 duration-150 shadow-2xl">
+          <div className="lg:hidden border-t border-border bg-card/95 backdrop-blur-xl px-4 sm:px-6 py-4 space-y-4 animate-in slide-in-from-top-2 duration-150 shadow-2xl">
             {/* Quick 6-digit Code for mobile */}
             <form
               onSubmit={handleJoin}
