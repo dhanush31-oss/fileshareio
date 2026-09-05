@@ -331,7 +331,7 @@ function DevelopersPage() {
       {/* Code SDK Generator Section */}
       <div className="mt-12 surface-panel rounded-2xl border border-border/80 overflow-hidden shadow-xl">
         {/* Header with Lang Tabs */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border/80 bg-muted/30">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 py-3 sm:py-4 gap-3 border-b border-border/80 bg-muted/30">
           <div className="flex items-center gap-2">
             <Code2 className="size-4 text-primary" />
             <span className="text-xs font-bold text-foreground">
@@ -339,7 +339,7 @@ function DevelopersPage() {
             </span>
           </div>
 
-          <div className="flex items-center gap-1">
+          <div className="flex flex-wrap items-center gap-1">
             {(["typescript", "python", "curl", "go"] as const).map((lang) => (
               <button
                 key={lang}
@@ -357,11 +357,11 @@ function DevelopersPage() {
         </div>
 
         {/* Code Content */}
-        <div className="relative p-6 bg-black/60 font-mono text-xs text-muted-foreground overflow-x-auto">
+        <div className="relative p-4 sm:p-6 bg-black/60 font-mono text-xs text-muted-foreground overflow-x-auto">
           <button
             type="button"
             onClick={() => copySnippet(CODE_EXAMPLES[selectedLang], "sdk")}
-            className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-card/80 border border-border/80 text-foreground text-xs hover:bg-muted transition-colors"
+            className="absolute top-3 sm:top-4 right-3 sm:right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-card/90 border border-border/80 text-foreground text-xs hover:bg-muted transition-colors shadow-md"
           >
             {copiedKey === "sdk" ? (
               <Check className="size-3.5 text-emerald-400" />
@@ -370,14 +370,14 @@ function DevelopersPage() {
             )}
             <span>Copy Code</span>
           </button>
-          <pre className="text-foreground/90 whitespace-pre leading-relaxed">
+          <pre className="text-foreground/90 whitespace-pre leading-relaxed pt-8 sm:pt-0">
             {CODE_EXAMPLES[selectedLang]}
           </pre>
         </div>
       </div>
 
       {/* Interactive API Playground */}
-      <div className="mt-12 surface-panel p-6 sm:p-8 rounded-2xl border border-border/80 shadow-xl space-y-6">
+      <div className="mt-12 surface-panel p-5 sm:p-8 rounded-2xl border border-border/80 shadow-xl space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
@@ -388,7 +388,7 @@ function DevelopersPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <select
               value={playgroundEndpoint}
               onChange={(e) =>
@@ -426,8 +426,8 @@ function DevelopersPage() {
       </div>
 
       {/* Schema Blueprint Section */}
-      <div className="mt-12 surface-panel p-6 sm:p-8 rounded-2xl border border-border/80 shadow-xl space-y-4">
-        <div className="flex items-center justify-between">
+      <div className="mt-12 surface-panel p-5 sm:p-8 rounded-2xl border border-border/80 shadow-xl space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Database className="size-5 text-emerald-400" />
             <h2 className="text-base font-bold text-foreground">
@@ -438,7 +438,7 @@ function DevelopersPage() {
             size="sm"
             variant="outline"
             onClick={() => copySnippet(SUPABASE_SCHEMA_SNIPPET, "schema")}
-            className="text-xs font-semibold border-border/80"
+            className="text-xs font-semibold border-border/80 self-start sm:self-auto"
           >
             {copiedKey === "schema" ? (
               <Check className="size-3.5 text-emerald-400 mr-1" />

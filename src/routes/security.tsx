@@ -176,52 +176,54 @@ function SecurityPage() {
           <FileCheck className="size-5 text-emerald-400" /> International Compliance Matrix
         </h2>
         <div className="surface-panel rounded-2xl border border-border/80 overflow-hidden shadow-lg">
-          <table className="w-full text-left text-xs">
-            <thead className="border-b border-border/80 bg-muted/30 text-muted-foreground uppercase text-[10px] tracking-wider font-semibold">
-              <tr>
-                <th className="px-4 py-3">Framework</th>
-                <th className="px-4 py-3">Jurisdiction</th>
-                <th className="px-4 py-3">Coverage & Scope</th>
-                <th className="px-4 py-3 text-right">Compliance Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/60">
-              <tr>
-                <td className="px-4 py-3.5 font-bold text-foreground">SOC2 Type II</td>
-                <td className="px-4 py-3.5 text-muted-foreground">Global (AICPA)</td>
-                <td className="px-4 py-3.5 text-muted-foreground">
-                  Security, Availability, and Confidentiality Trust Principles
-                </td>
-                <td className="px-4 py-3.5 text-right font-bold text-emerald-400">
-                  Verified Passed
-                </td>
-              </tr>
-              <tr>
-                <td className="px-4 py-3.5 font-bold text-foreground">ISO/IEC 27001:2022</td>
-                <td className="px-4 py-3.5 text-muted-foreground">International</td>
-                <td className="px-4 py-3.5 text-muted-foreground">
-                  Information Security Management Systems (ISMS)
-                </td>
-                <td className="px-4 py-3.5 text-right font-bold text-emerald-400">Certified</td>
-              </tr>
-              <tr>
-                <td className="px-4 py-3.5 font-bold text-foreground">GDPR & UK-GDPR</td>
-                <td className="px-4 py-3.5 text-muted-foreground">European Union & UK</td>
-                <td className="px-4 py-3.5 text-muted-foreground">
-                  Data minimization, right to erasure, and EU data residency
-                </td>
-                <td className="px-4 py-3.5 text-right font-bold text-emerald-400">Compliant</td>
-              </tr>
-              <tr>
-                <td className="px-4 py-3.5 font-bold text-foreground">FinCEN Escrow Rules</td>
-                <td className="px-4 py-3.5 text-muted-foreground">United States</td>
-                <td className="px-4 py-3.5 text-muted-foreground">
-                  Conditional multi-sig digital asset custody guidelines
-                </td>
-                <td className="px-4 py-3.5 text-right font-bold text-emerald-400">Compliant</td>
-              </tr>
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs min-w-[540px]">
+              <thead className="border-b border-border/80 bg-muted/30 text-muted-foreground uppercase text-[10px] tracking-wider font-semibold">
+                <tr>
+                  <th className="px-4 py-3">Framework</th>
+                  <th className="px-4 py-3">Jurisdiction</th>
+                  <th className="px-4 py-3">Coverage & Scope</th>
+                  <th className="px-4 py-3 text-right">Compliance Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/60">
+                <tr>
+                  <td className="px-4 py-3.5 font-bold text-foreground">SOC2 Type II</td>
+                  <td className="px-4 py-3.5 text-muted-foreground">Global (AICPA)</td>
+                  <td className="px-4 py-3.5 text-muted-foreground">
+                    Security, Availability, and Confidentiality Trust Principles
+                  </td>
+                  <td className="px-4 py-3.5 text-right font-bold text-emerald-400">
+                    Verified Passed
+                  </td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3.5 font-bold text-foreground">ISO/IEC 27001:2022</td>
+                  <td className="px-4 py-3.5 text-muted-foreground">International</td>
+                  <td className="px-4 py-3.5 text-muted-foreground">
+                    Information Security Management Systems (ISMS)
+                  </td>
+                  <td className="px-4 py-3.5 text-right font-bold text-emerald-400">Certified</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3.5 font-bold text-foreground">GDPR & UK-GDPR</td>
+                  <td className="px-4 py-3.5 text-muted-foreground">European Union & UK</td>
+                  <td className="px-4 py-3.5 text-muted-foreground">
+                    Data minimization, right to erasure, and EU data residency
+                  </td>
+                  <td className="px-4 py-3.5 text-right font-bold text-emerald-400">Compliant</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3.5 font-bold text-foreground">FinCEN Escrow Rules</td>
+                  <td className="px-4 py-3.5 text-muted-foreground">United States</td>
+                  <td className="px-4 py-3.5 text-muted-foreground">
+                    Conditional multi-sig digital asset custody guidelines
+                  </td>
+                  <td className="px-4 py-3.5 text-right font-bold text-emerald-400">Compliant</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
