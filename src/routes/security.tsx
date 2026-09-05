@@ -33,13 +33,13 @@ export const Route = createFileRoute("/security")({
       {
         name: "description",
         content:
-          "Zero-Knowledge digital asset escrow architecture, Supabase private RLS storage policies, SOC2 Type II compliance, and developer audit protocols.",
+          "Zero-Knowledge digital asset escrow architecture, private cloud RLS storage policies, SOC2 Type II compliance, and developer audit protocols.",
       },
       { property: "og:title", content: "Enterprise Security & Compliance Whitepaper | Vaultdrop" },
       {
         property: "og:description",
         content:
-          "Zero-Knowledge digital asset escrow architecture, Supabase private RLS storage policies, SOC2 Type II compliance, and developer audit protocols.",
+          "Zero-Knowledge digital asset escrow architecture, private cloud RLS storage policies, SOC2 Type II compliance, and developer audit protocols.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -79,7 +79,7 @@ function SecurityPage() {
           Zero-Knowledge Security & Developer Audit Architecture
         </h1>
         <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-          How Vaultdrop combines Supabase Row-Level Security, multi-chain cryptographic
+          How Vaultdrop combines Private Cloud Row-Level Security, multi-chain cryptographic
           verification, and bank-grade zero-knowledge custody for international high-value
           transfers.
         </p>
@@ -93,7 +93,7 @@ function SecurityPage() {
           </div>
           <h3 className="font-bold text-base text-foreground">256-Bit AES Storage</h3>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            All files uploaded to Supabase Storage are encrypted at rest with private KMS keys and
+            All files uploaded to Private Cloud Storage are encrypted at rest with private KMS keys and
             isolated under UUID paths.
           </p>
         </div>
@@ -132,13 +132,13 @@ function SecurityPage() {
         </div>
       </div>
 
-      {/* Deep-Dive: Supabase Row-Level Security (RLS) & Access Control */}
+      {/* Deep-Dive: Private Cloud Row-Level Security (RLS) & Access Control */}
       <div className="mt-12 surface-panel p-6 sm:p-8 rounded-2xl border border-border/80 shadow-xl space-y-6">
         <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
-          <Database className="size-5 text-primary" /> Supabase Storage & Database RLS Isolation
+          <Database className="size-5 text-primary" /> Private Cloud Storage & Database RLS Isolation
         </h2>
         <p className="text-xs text-muted-foreground leading-relaxed">
-          Every database record and file object in Supabase is protected by strict PostgreSQL
+          Every database record and file object in the Cloud Server is protected by strict PostgreSQL
           Row-Level Security policies. Here is how permissions are enforced:
         </p>
 
@@ -235,7 +235,7 @@ function SecurityPage() {
         </div>
         <p className="text-xs text-muted-foreground leading-relaxed">
           We award bounties up to $25,000 USD for verified critical vulnerabilities in our smart
-          escrow contracts or Supabase storage RLS boundaries.
+          escrow contracts or cloud storage RLS boundaries.
         </p>
 
         <form onSubmit={handleBountySubmit} className="space-y-3 pt-2">

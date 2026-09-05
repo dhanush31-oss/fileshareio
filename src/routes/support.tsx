@@ -57,15 +57,15 @@ export const Route = createFileRoute("/support")({
 const FAQ_ITEMS = [
   {
     q: "How does Vaultdrop protect both the buyer and seller?",
-    a: "Vaultdrop holds uploaded assets in encrypted private Supabase Storage buckets under strict PostgreSQL Row-Level-Security (RLS). The buyer can inspect file metadata and terms, but cannot download the raw files until payment is confirmed on-chain or manually approved by the seller. If a dispute arises, developer arbiters review access logs and cryptographic proofs.",
+    a: "Vaultdrop holds uploaded assets in encrypted private cloud storage buckets under strict PostgreSQL Row-Level-Security (RLS). The buyer can inspect file metadata and terms, but cannot download the raw files until payment is confirmed on-chain or manually approved by the seller. If a dispute arises, developer arbiters review access logs and cryptographic proofs.",
   },
   {
     q: "What happens if a buyer submits a fake payment receipt?",
     a: "The seller retains full control and manually reviews payment proof before clicking 'Approve & Release Files'. Furthermore, for on-chain crypto transactions, our automated Covalent oracle validates the exact transaction hash, block depth, and token transfer amount on the blockchain before verifying.",
   },
   {
-    q: "How do I download my unlocked files from Supabase?",
-    a: "Once approved, the escrow terminal generates time-limited signed URLs directly from our high-speed Supabase Storage CDN. You can click 'Download All' to retrieve your files immediately.",
+    q: "How do I download my unlocked files from the Cloud Server?",
+    a: "Once approved, the escrow terminal generates time-limited signed URLs directly from our high-speed Private Cloud CDN. You can click 'Download All' to retrieve your files immediately.",
   },
   {
     q: "Can developers or third parties see my confidential files?",
@@ -135,7 +135,7 @@ function SupportPage() {
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search questions, payment verification, Supabase storage..."
+            placeholder="Search questions, payment verification, cloud storage..."
             className="pl-10 h-11 text-xs bg-card border-border/80 rounded-xl shadow-md"
           />
         </div>

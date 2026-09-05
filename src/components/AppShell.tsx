@@ -45,7 +45,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [currentLocale, setCurrentLocale] = useState<SupportedLocale>("EN");
   const [showLangMenu, setShowLangMenu] = useState(false);
-  const [supabaseLatency, setSupabaseLatency] = useState<number | null>(24);
+  const [cloudLatency, setCloudLatency] = useState<number | null>(24);
 
   useEffect(() => {
     const saved = localStorage.getItem("vaultdrop_locale") as SupportedLocale;
@@ -319,7 +319,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 onClick={() => setShowMobileNav(false)}
                 className="p-2.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground flex items-center gap-2"
               >
-                <Terminal className="size-4" /> API & Supabase SDK
+                <Terminal className="size-4" /> API & Cloud SDK
               </Link>
               <Link
                 to="/security"
@@ -368,19 +368,19 @@ export function AppShell({ children }: { children: ReactNode }) {
               </Link>
               <p className="text-xs text-muted-foreground leading-relaxed max-w-sm">
                 The international digital asset settlement and confidential escrow cloud. Powered by
-                Supabase Storage, Zero-Knowledge cryptographic verification, and multi-network
+                Encrypted Private Cloud Storage, Zero-Knowledge cryptographic verification, and multi-network
                 on-chain settlements for global clients.
               </p>
 
-              {/* Supabase & Network Telemetry Pill */}
+              {/* Cloud Server Telemetry Pill */}
               <div className="flex flex-wrap items-center gap-2 pt-2">
                 <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-mono">
                   <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                  <span>Supabase Storage: Operational ({supabaseLatency}ms)</span>
+                  <span>Cloud Storage Server: Operational ({cloudLatency}ms)</span>
                 </div>
                 <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary text-[11px] font-mono">
                   <Globe2 className="size-3" />
-                  <span>4 Global Vault Regions</span>
+                  <span>4 Global Cloud Vault Regions</span>
                 </div>
               </div>
             </div>
@@ -447,7 +447,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </li>
                 <li>
                   <Link to="/developers" className="hover:text-primary transition-colors">
-                    REST API & Supabase SDK
+                    REST API & Cloud SDK
                   </Link>
                 </li>
                 <li>
@@ -498,14 +498,12 @@ export function AppShell({ children }: { children: ReactNode }) {
                   </Link>
                 </li>
                 <li>
-                  <a
-                    href="https://supabase.com"
-                    target="_blank"
-                    rel="noreferrer"
+                  <Link
+                    to="/security"
                     className="hover:text-primary transition-colors inline-flex items-center gap-1"
                   >
-                    Supabase Infrastructure <ArrowUpRight className="size-3" />
-                  </a>
+                    Encrypted Cloud Infrastructure <ArrowUpRight className="size-3" />
+                  </Link>
                 </li>
               </ul>
             </div>

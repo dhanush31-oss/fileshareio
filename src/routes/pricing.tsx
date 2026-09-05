@@ -208,7 +208,7 @@ function PricingPage() {
               </li>
               <li className="flex items-center gap-2">
                 <Check className="size-4 text-emerald-400 shrink-0" />
-                <span>72-hour Supabase retention</span>
+                <span>72-hour Private Cloud retention</span>
               </li>
             </ul>
           </div>
@@ -261,7 +261,7 @@ function PricingPage() {
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="size-4 text-primary shrink-0" />
-                <span>30-day extended Supabase vault storage</span>
+                <span>30-day extended Private Cloud vault storage</span>
               </li>
             </ul>
           </div>

@@ -59,7 +59,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "The international digital asset settlement and confidential file delivery cloud. Powered by Supabase Storage, multi-chain on-chain settlements, and 6-digit room unlocking.",
+          "The international digital asset settlement and confidential file delivery cloud. Powered by Encrypted Private Cloud Storage, multi-chain on-chain settlements, and 6-digit room unlocking.",
       },
       {
         property: "og:title",
@@ -68,7 +68,7 @@ export const Route = createFileRoute("/")({
       {
         property: "og:description",
         content:
-          "The international digital asset settlement and confidential file delivery cloud. Powered by Supabase Storage, multi-chain on-chain settlements, and 6-digit room unlocking.",
+          "The international digital asset settlement and confidential file delivery cloud. Powered by Encrypted Private Cloud Storage, multi-chain on-chain settlements, and 6-digit room unlocking.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -158,7 +158,7 @@ const TESTIMONIALS = [
   },
   {
     quote:
-      "As a VFX supervisor delivering 20GB 4K render passes to Hollywood agencies, Vaultdrop’s Supabase storage speed and instant release terminal are unmatched.",
+      "As a VFX supervisor delivering 20GB 4K render passes to Hollywood agencies, Vaultdrop’s private cloud storage speed and instant release terminal are unmatched.",
     author: "Elena Rostova",
     role: "Lead Technical Director, Apex FX",
     location: "Zurich, Switzerland",
@@ -223,7 +223,7 @@ function LandingPage() {
         {/* Subtitle */}
         <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto font-normal">
           Upload source code repositories, 3D master renders, confidential data rooms, or digital
-          IP. Assets are locked in private Supabase Storage and released instantly upon verified
+          IP. Assets are locked in private Encrypted Cloud Storage and released instantly upon verified
           on-chain or wire settlement.
         </p>
 
@@ -243,7 +243,7 @@ function LandingPage() {
                     Send Files & Lock Escrow
                   </h3>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Upload multiple files to Supabase and generate an instant 6-digit room code with
+                    Upload multiple files to private cloud storage and generate an instant 6-digit room code with
                     smart release rules.
                   </p>
                 </div>
@@ -327,7 +327,7 @@ function LandingPage() {
                     currency: "USD",
                     chain: "polygon-mainnet",
                     token: "USDC",
-                    instructions: "Inspect the low-res watermarked preview on our client portal. Release payment to unlock the uncompressed 18GB 4K render package from Supabase Storage.",
+                    instructions: "Inspect the low-res watermarked preview on our client portal. Release payment to unlock the uncompressed 18GB 4K render package from private cloud storage.",
                     description: "Multi-gigabyte 3D project packages (Blender, Maya, Unreal Engine 5, C4D) and 4K/8K master renders.",
                   }}
                   className="hover:text-primary transition-colors underline-offset-2 hover:underline"
@@ -423,7 +423,7 @@ function LandingPage() {
                   Step 1: Seller Uploads Payload
                 </span>
                 <span className="text-xs px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-mono">
-                  Supabase Storage
+                  Encrypted Cloud Server
                 </span>
               </div>
               <div className="p-4 rounded-xl bg-card border border-border/70 flex items-center justify-between">
@@ -440,7 +440,7 @@ function LandingPage() {
               </div>
               <p className="text-xs text-muted-foreground">
                 Room Code <code className="text-primary font-bold">#849201</code> generated. File is
-                safely stored in Supabase private bucket with 256-bit AES encryption.
+                safely stored in private cloud storage with 256-bit AES encryption.
               </p>
             </div>
           )}
@@ -511,7 +511,7 @@ function LandingPage() {
             <div className="space-y-4 animate-in fade-in duration-200">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-emerald-400 uppercase font-mono">
-                  Step 4: Instant Supabase Download Release
+                  Step 4: Instant Secure Cloud Download Release
                 </span>
                 <span className="text-xs px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-mono">
                   Settlement Complete
@@ -523,7 +523,7 @@ function LandingPage() {
                     Room Status: Approved & Released
                   </p>
                   <p className="text-xs text-muted-foreground font-mono">
-                    High-Speed Signed Supabase CDN URL active
+                    High-Speed Signed Cloud CDN URL active
                   </p>
                 </div>
                 <Button

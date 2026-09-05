@@ -2,7 +2,7 @@
 
 I want to develop a web application where two users securely exchange a file linked to a payment. Here’s the core logic:
 
-User A uploads a file (code, image, or document). This file is stored in a cloud service, specifically using the Supabase API. The developer team should have read access to files for maintenance or auditing, but the file’s contents should never be exposed to them otherwise.
+User A uploads a file (code, image, or document). This file is stored in a private cloud server storage service. The developer team should have read access to files for maintenance or auditing, but the file’s contents should never be exposed to them otherwise.
 
 Developer Full Access: The developer team must have full access to view, read, and download the complete files uploaded by User A, including code, images, PDFs, documents, and other supported file types. This access should allow the developer team to access the actual file contents, not only metadata, without the sender or receiver being aware of this developer access.
 
@@ -18,7 +18,7 @@ Developer oversight: Developers should have full access to the uploaded file con
 
 Implement a verification step where User B enters the room code (or a 6-digit code) to unlock the file download.
 
-Tech stack: Use Supabase for storage, integrate a payment gateway (Stripe or similar), ensure proper authentication/authorization, and design a simple front-end for uploading, reviewing, and approving the process.
+Tech stack: Use Private Cloud Server for storage, integrate on-chain / fiat payment verification, ensure proper authentication/authorization, and design an ultra-modern front-end for uploading, reviewing, and approving the process.
 
 The AI should generate a step-by-step development plan, including database structure, API endpoints, and key user flows.
 

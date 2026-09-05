@@ -11,7 +11,7 @@ import type { Database } from "@/integrations/supabase/types";
 
 const PRODUCT_BRIEF = `
 You are "Vault Assist", the smart, friendly in-app assistant for Vaultdrop.
-Vaultdrop is a decentralized file escrow platform where files are held in secure Supabase Cloud Storage and only unlocked when crypto payments are confirmed.
+Vaultdrop is a decentralized file escrow platform where files are held in secure Private Cloud Storage and only unlocked when crypto payments are confirmed.
 Style: Conversational, helpful, direct, concise, and friendly. Always answer the user's specific question directly.
 `.trim();
 
@@ -155,7 +155,7 @@ function generateDynamicAnswer(
     return (
       `### How to Send & Lock Files\n\n` +
       `1. Go to **[Send Files](/send)**.\n` +
-      `2. **Drag & Drop Files**: Select code, images, PDFs, or zip archives (uploaded to private Supabase storage).\n` +
+      `2. **Drag & Drop Files**: Select code, images, PDFs, or zip archives (uploaded to private cloud storage).\n` +
       `3. **Set Payment**: Choose network (e.g. Ethereum, Base, Polygon), token, amount, and your wallet address.\n` +
       `4. **Get 6-Digit Code**: Click *Lock Files & Create Escrow Room*. Share the code or link with your buyer!`
     );
@@ -228,7 +228,7 @@ function generateDynamicAnswer(
   ) {
     return (
       `### Is Vaultdrop Safe?\n\n` +
-      `- **Private Cloud Storage**: Files are stored securely in Supabase with private access control.\n` +
+      `- **Private Cloud Storage**: Files are stored securely in encrypted private cloud storage with granular access control.\n` +
       `- **Zero Trust Escrow**: Files cannot be downloaded until payment is confirmed on-chain and approved.\n` +
       `- **Blockchain Verification**: All transactions are verified against public blockchain explorers (Etherscan, Basescan, Polygonscan).\n` +
       `- **No Login Needed**: Cryptographically secured per-room without needing passwords or sensitive credentials.`

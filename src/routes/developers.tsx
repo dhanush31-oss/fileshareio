@@ -26,17 +26,17 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/developers")({
   head: () => ({
     meta: [
-      { title: "Developer API & Supabase Integration SDK | Vaultdrop" },
+      { title: "Developer API & Cloud SDK | Vaultdrop" },
       {
         name: "description",
         content:
-          "Integrate international digital asset escrow into your applications. Programmatic Supabase storage uploads, escrow room creation, and webhooks.",
+          "Integrate international digital asset escrow into your applications. Programmatic cloud storage uploads, escrow room creation, and webhooks.",
       },
-      { property: "og:title", content: "Developer API & Supabase Integration SDK | Vaultdrop" },
+      { property: "og:title", content: "Developer API & Cloud SDK | Vaultdrop" },
       {
         property: "og:description",
         content:
-          "Integrate international digital asset escrow into your applications. Programmatic Supabase storage uploads, escrow room creation, and webhooks.",
+          "Integrate international digital asset escrow into your applications. Programmatic cloud storage uploads, escrow room creation, and webhooks.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -46,12 +46,12 @@ export const Route = createFileRoute("/developers")({
 });
 
 const CODE_EXAMPLES = {
-  typescript: `// 1. Upload Encrypted Asset directly to Supabase & Create Escrow Room
-import { createClient } from "@supabase/supabase-js";
+  typescript: `// 1. Upload Encrypted Asset to Private Cloud Storage & Create Escrow Room
+import { createClient } from "@vaultdrop/cloud-sdk";
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+const cloud = createClient(
+  process.env.CLOUD_SERVER_URL!,
+  process.env.CLOUD_SERVICE_ROLE_KEY!
 );
 
 async function createEscrowDelivery() {
@@ -59,14 +59,14 @@ async function createEscrowDelivery() {
   const fileName = "saas-codebase-v2.zip";
   const storagePath = \`\${userId}/\${crypto.randomUUID()}-\${fileName}\`;
 
-  // Upload to private Supabase 'escrow-files' bucket
-  const { error: uploadError } = await supabase.storage
+  // Upload to private cloud 'escrow-files' bucket
+  const { error: uploadError } = await cloud.storage
     .from("escrow-files")
     .upload(storagePath, fileBuffer, { contentType: "application/zip" });
 
   if (uploadError) throw uploadError;
 
-  // Insert room in Supabase with conditional settlement
+  // Insert room in cloud database with conditional settlement
   const res = await fetch("https://api.vaultdrop.io/api/room", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -87,7 +87,7 @@ async function createEscrowDelivery() {
   console.log("Secure Room Code Generated:", roomCode); // e.g. 849201
 }`,
 
-  python: `# Python SDK - Automated Escrow Delivery & Signed Supabase Download
+  python: `# Python SDK - Automated Escrow Delivery & Signed Cloud Download
 import requests
 import base64
 
@@ -138,7 +138,7 @@ curl -X POST https://api.vaultdrop.io/api/room \\
     }]
   }'`,
 
-  go: `// Go - Programmatic Supabase Escrow Room Polling
+  go: `// Go - Programmatic Cloud Escrow Room Polling
 package main
 
 import (
@@ -164,7 +164,7 @@ func main() {
 }`,
 };
 
-const SUPABASE_SCHEMA_SNIPPET = `-- Supabase PostgreSQL Schema with Row Level Security (RLS)
+const SUPABASE_SCHEMA_SNIPPET = `-- Private Cloud Database Schema with Row Level Security (RLS)
 CREATE TABLE public.rooms (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   room_code text NOT NULL UNIQUE,
@@ -187,7 +187,7 @@ CREATE TABLE public.rooms (
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 
--- Supabase Storage Bucket & RLS Policy
+-- Cloud Storage Bucket & RLS Policy
 INSERT INTO storage.buckets (id, name, public) VALUES ('escrow-files', 'escrow-files', false);
 
 CREATE POLICY "seller reads and uploads own files"
@@ -247,7 +247,7 @@ function DevelopersPage() {
                 chain: "eth-mainnet",
                 file_count: 2,
                 unlocked_download_urls: [
-                  "https://fgoyomqbzccmbnntzwko.supabase.co/storage/v1/object/sign/escrow-files/...",
+                  "https://vault.cloud.vaultdrop.io/storage/v1/object/sign/escrow-files/...",
                 ],
               },
             },
@@ -281,13 +281,13 @@ function DevelopersPage() {
       {/* Developer Header */}
       <div className="space-y-4 max-w-4xl">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-bold uppercase tracking-wider">
-          <Terminal className="size-3.5" /> Developer Platform & Supabase SDK
+          <Terminal className="size-3.5" /> Developer Platform & Cloud SDK
         </div>
         <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground">
           Build Programmatic Escrow Workflows
         </h1>
         <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-          Full REST API and Supabase Storage integration for automating high-value file deliveries,
+          Full REST API and Private Cloud Storage integration for automating high-value file deliveries,
           on-chain smart release conditions, and signed download URLs.
         </p>
       </div>
@@ -298,7 +298,7 @@ function DevelopersPage() {
           <div className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
             <Database className="size-5" />
           </div>
-          <h3 className="font-bold text-sm text-foreground">Supabase Storage Backend</h3>
+          <h3 className="font-bold text-sm text-foreground">Private Cloud Storage Engine</h3>
           <p className="text-xs text-muted-foreground leading-relaxed">
             Direct integration with private `escrow-files` and `payment-proofs` buckets with
             cryptographic RLS isolation.
@@ -384,7 +384,7 @@ function DevelopersPage() {
               <Server className="size-5 text-primary" /> Interactive REST API Playground
             </h2>
             <p className="text-xs text-muted-foreground mt-1">
-              Simulate API requests and view real-time Supabase JSON responses.
+              Simulate API requests and view real-time Cloud API JSON responses.
             </p>
           </div>
 
@@ -425,13 +425,13 @@ function DevelopersPage() {
         )}
       </div>
 
-      {/* Supabase Schema Blueprint Section */}
+      {/* Schema Blueprint Section */}
       <div className="mt-12 surface-panel p-6 sm:p-8 rounded-2xl border border-border/80 shadow-xl space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Database className="size-5 text-emerald-400" />
             <h2 className="text-base font-bold text-foreground">
-              PostgreSQL & Supabase Storage Blueprint
+              PostgreSQL & Cloud Storage Blueprint
             </h2>
           </div>
           <Button
@@ -449,7 +449,7 @@ function DevelopersPage() {
           </Button>
         </div>
         <p className="text-xs text-muted-foreground leading-relaxed">
-          Execute this SQL in your Supabase SQL Editor to instantly provision identical tables,
+          Execute this SQL in your Cloud Database Editor to instantly provision identical tables,
           types, and private storage policies for testing or staging deployments.
         </p>
         <pre className="p-4 rounded-xl bg-black/60 border border-border font-mono text-[11px] text-muted-foreground overflow-x-auto leading-relaxed max-h-60">

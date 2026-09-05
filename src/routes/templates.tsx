@@ -125,7 +125,7 @@ export const ESCROW_TEMPLATES: EscrowTemplate[] = [
       "Commercial broadcast usage release certificate",
     ],
     sampleInstructions:
-      "Inspect the low-res watermarked preview on our client portal. Release payment to unlock the uncompressed 18GB 4K render package from Supabase Storage.",
+      "Inspect the low-res watermarked preview on our client portal. Release payment to unlock the uncompressed 18GB 4K render package from private cloud storage.",
     legalTermsExcerpt:
       "Delivery constitutes full commercial synchronization and broadcast rights transfer under standard international creative production guidelines.",
   },
@@ -165,7 +165,7 @@ export const ESCROW_TEMPLATES: EscrowTemplate[] = [
     summary:
       "Safe handover of premium domain EPP transfer authorization codes, social handles, and trademark files.",
     description:
-      "Eliminates domain escrow fraud. EPP auth codes and registrar transfer instructions are locked in Supabase storage until buyer funds are verified.",
+      "Eliminates domain escrow fraud. EPP auth codes and registrar transfer instructions are locked in private cloud storage until buyer funds are verified.",
     suggestedPrice: "6,000.00",
     suggestedCurrency: "USD",
     suggestedChain: "base-mainnet",
@@ -217,7 +217,7 @@ export const ESCROW_TEMPLATES: EscrowTemplate[] = [
     summary:
       "Milestone-based code release for client contractor projects with automated staging test notes.",
     description:
-      "Protects both independent developers and global agencies. Code is delivered in Supabase private storage and unlocked when milestone invoice is settled.",
+      "Protects both independent developers and global agencies. Code is delivered in private cloud storage and unlocked when milestone invoice is settled.",
     suggestedPrice: "1,800.00",
     suggestedCurrency: "USD",
     suggestedChain: "arbitrum-mainnet",
@@ -269,7 +269,7 @@ export const ESCROW_TEMPLATES: EscrowTemplate[] = [
     summary:
       "Fine-tuned model checkpoints (Safetensors / GGUF / ONNX) and curated training datasets.",
     description:
-      "Large-scale AI asset exchange. High-performance Supabase storage transfer for proprietary LLM fine-tunes, LoRA weights, and labeled datasets.",
+      "Large-scale AI asset exchange. High-performance private cloud transfer for proprietary LLM fine-tunes, LoRA weights, and labeled datasets.",
     suggestedPrice: "7,500.00",
     suggestedCurrency: "USD",
     suggestedChain: "eth-mainnet",

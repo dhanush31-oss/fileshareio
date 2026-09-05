@@ -235,7 +235,7 @@ function ExplorerPage() {
         </h1>
         <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
           Inspect real-time on-chain settlements, verify cryptographic payload SHA-256 hashes, and
-          monitor multi-region Supabase storage infrastructure across the globe.
+          monitor multi-region Cloud Storage infrastructure across the globe.
         </p>
       </div>
 
@@ -284,7 +284,7 @@ function ExplorerPage() {
             <ShieldCheck className="size-4 text-indigo-400" />
           </div>
           <p className="text-2xl font-extrabold text-foreground font-mono">Zero-Knowledge</p>
-          <p className="text-[11px] text-indigo-400">Supabase Private Storage RLS</p>
+          <p className="text-[11px] text-indigo-400">Private Cloud Storage RLS</p>
         </div>
       </div>
 
@@ -349,7 +349,7 @@ function ExplorerPage() {
       {/* Global Storage Nodes Status */}
       <div className="mt-10 space-y-4">
         <h2 className="text-base font-bold text-foreground flex items-center gap-2">
-          <Server className="size-4 text-primary" /> Global Supabase Storage Point Presence
+          <Server className="size-4 text-primary" /> Global Cloud Storage Point Presence
         </h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {STORAGE_REGIONS.map((r) => (

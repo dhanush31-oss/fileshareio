@@ -318,7 +318,7 @@ function SendPage() {
 
     setBusy(true);
     setUploadProgress(15);
-    toast.loading("Encrypting files & storing in Supabase...", { id: "escrow-upload" });
+    toast.loading("Encrypting files & storing in Cloud Server...", { id: "escrow-upload" });
 
     try {
       const serializedFiles: {
@@ -417,7 +417,7 @@ function SendPage() {
 
         setUploadProgress(100);
         setCode(data.roomCode);
-        toast.success(`Escrow Room #${data.roomCode} created in Supabase!`, {
+        toast.success(`Escrow Room #${data.roomCode} created in Cloud Server!`, {
           id: "escrow-upload",
         });
       } finally {
