@@ -3,6 +3,7 @@ import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ESCROW_TEMPLATES } from "@/routes/templates";
 import {
   Activity,
   ArrowRight,
@@ -109,6 +110,7 @@ const GLOBAL_STATS = [
 
 const USE_CASES = [
   {
+    templateId: "saas-codebase-handover",
     title: "SaaS Codebase & Repository Handover",
     category: "Software & Dev",
     icon: Code2,
@@ -117,6 +119,7 @@ const USE_CASES = [
       "Safely transfer private GitHub repos, environment secrets, and intellectual property upon invoice clearance.",
   },
   {
+    templateId: "3d-vfx-master-delivery",
     title: "3D VFX & 4K Studio Master Delivery",
     category: "Creative Media",
     icon: Film,
@@ -125,6 +128,7 @@ const USE_CASES = [
       "Lock raw Blender / Unreal Engine 5 archives and ProRes master sequences behind verified client milestone payments.",
   },
   {
+    templateId: "cross-border-nda-dataroom",
     title: "Cross-Border Commercial M&A Data Room",
     category: "Legal & Corporate",
     icon: Scale,
@@ -133,6 +137,7 @@ const USE_CASES = [
       "Share sensitive audit statements, cap tables, and legal agreements with full developer access audit logging.",
   },
   {
+    templateId: "domain-digital-ip-transfer",
     title: "Domain Name & Digital IP Transfers",
     category: "Digital Assets",
     icon: Globe,
@@ -297,21 +302,51 @@ function LandingPage() {
               </span>
               <div className="flex flex-wrap items-center gap-2">
                 <Link
-                  to="/templates"
+                  to="/send"
+                  search={{
+                    template: "saas-codebase-handover",
+                    title: "Full-Stack SaaS Codebase & Repository Handover",
+                    price: "4500",
+                    currency: "USD",
+                    chain: "eth-mainnet",
+                    token: "USDT",
+                    instructions: "1. Verify the repository hash matches our agreed commit milestone.\n2. Submit payment in USDT (ERC-20) or USDC.\n3. Seller will inspect proof and unlock full source archive + cloud credentials within 1 hour.",
+                    description: "Complete transfer of GitHub/GitLab repositories, environment configurations, and deployment keys.",
+                  }}
                   className="hover:text-primary transition-colors underline-offset-2 hover:underline"
                 >
                   SaaS Codebase
                 </Link>
                 <span>·</span>
                 <Link
-                  to="/templates"
+                  to="/send"
+                  search={{
+                    template: "3d-vfx-master-delivery",
+                    title: "High-Resolution 3D, CGI & VFX Studio Master Delivery",
+                    price: "2800",
+                    currency: "USD",
+                    chain: "polygon-mainnet",
+                    token: "USDC",
+                    instructions: "Inspect the low-res watermarked preview on our client portal. Release payment to unlock the uncompressed 18GB 4K render package from Supabase Storage.",
+                    description: "Multi-gigabyte 3D project packages (Blender, Maya, Unreal Engine 5, C4D) and 4K/8K master renders.",
+                  }}
                   className="hover:text-primary transition-colors underline-offset-2 hover:underline"
                 >
                   3D VFX Media
                 </Link>
                 <span>·</span>
                 <Link
-                  to="/templates"
+                  to="/send"
+                  search={{
+                    template: "cross-border-nda-dataroom",
+                    title: "Cross-Border Commercial M&A Data Room & Confidential NDA",
+                    price: "15000",
+                    currency: "USD",
+                    chain: "eth-mainnet",
+                    token: "ETH",
+                    instructions: "Enter the room code provided by legal counsel. Provide wire transfer confirmation or deposit escrow to access the confidential data room files.",
+                    description: "Confidential financial audits, cap tables, and legal M&A dossiers with cryptographic access logs.",
+                  }}
                   className="hover:text-primary transition-colors underline-offset-2 hover:underline"
                 >
                   M&A Data Room
@@ -579,12 +614,37 @@ function LandingPage() {
                   </p>
                 </div>
 
-                <Link
-                  to="/templates"
-                  className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1"
-                >
-                  Use Template <ChevronRight className="size-3.5" />
-                </Link>
+                {(() => {
+                  const tpl = ESCROW_TEMPLATES.find((t) => t.id === uc.templateId);
+                  if (tpl) {
+                    return (
+                      <Link
+                        to="/send"
+                        search={{
+                          template: tpl.id,
+                          title: tpl.title,
+                          price: tpl.suggestedPrice.replace(/,/g, ""),
+                          currency: tpl.suggestedCurrency,
+                          chain: tpl.suggestedChain,
+                          token: tpl.tokenSymbol,
+                          instructions: tpl.sampleInstructions,
+                          description: `${tpl.summary}\n\nDeliverable Checklist:\n${tpl.checklist.map((c) => `- ${c}`).join("\n")}`,
+                        }}
+                        className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1"
+                      >
+                        Use Template <ChevronRight className="size-3.5" />
+                      </Link>
+                    );
+                  }
+                  return (
+                    <Link
+                      to="/templates"
+                      className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1"
+                    >
+                      Use Template <ChevronRight className="size-3.5" />
+                    </Link>
+                  );
+                })()}
               </div>
             );
           })}

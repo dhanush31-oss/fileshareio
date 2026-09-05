@@ -187,12 +187,26 @@ function SendPage() {
     const pTitle = search.title || urlParams?.get("title");
     const pPrice = search.price || urlParams?.get("price");
     const pCurrency = search.currency || urlParams?.get("currency");
+    const pChain = search.chain || urlParams?.get("chain");
+    const pToken = search.token || urlParams?.get("token");
     const pInstructions = search.instructions || urlParams?.get("instructions");
     const pDescription = search.description || urlParams?.get("description");
 
     if (pTitle) setTitle(pTitle);
     if (pPrice) setTotalAmount(pPrice);
-    if (pCurrency) setCurrencyName(pCurrency);
+    if (pToken) {
+      setCurrencyName(pToken.toUpperCase());
+    } else if (pCurrency) {
+      setCurrencyName(pCurrency.toUpperCase());
+    }
+    if (pChain) {
+      const match = NETWORKS.find(
+        (n) =>
+          n.id.toLowerCase() === pChain.toLowerCase() ||
+          pChain.toLowerCase().includes(n.id.toLowerCase()),
+      );
+      if (match) setNetwork(match.id);
+    }
     if (pInstructions) setInstructions(pInstructions);
     if (pDescription) setDescription(pDescription);
     if (templateId) {
