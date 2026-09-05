@@ -117,13 +117,6 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Compass className="size-3.5" /> Explorer
               </Link>
               <Link
-                to="/developers"
-                activeProps={{ className: "text-foreground bg-muted font-semibold" }}
-                className="px-3 py-1.5 rounded-lg hover:text-foreground hover:bg-muted/50 transition-colors flex items-center gap-1.5 shrink-0"
-              >
-                <Terminal className="size-3.5" /> Developers & API
-              </Link>
-              <Link
                 to="/security"
                 activeProps={{ className: "text-foreground bg-muted font-semibold" }}
                 className="px-3 py-1.5 rounded-lg hover:text-foreground hover:bg-muted/50 transition-colors flex items-center gap-1.5 shrink-0"
@@ -315,13 +308,6 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Compass className="size-4" /> Public Explorer
               </Link>
               <Link
-                to="/developers"
-                onClick={() => setShowMobileNav(false)}
-                className="p-2.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground flex items-center gap-2"
-              >
-                <Terminal className="size-4" /> API & Cloud SDK
-              </Link>
-              <Link
                 to="/security"
                 onClick={() => setShowMobileNav(false)}
                 className="p-2.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground flex items-center gap-2"
@@ -338,16 +324,9 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Link
                 to="/support"
                 onClick={() => setShowMobileNav(false)}
-                className="p-2.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground flex items-center gap-2"
-              >
-                <MessageSquareText className="size-4" /> 24/7 Support AI
-              </Link>
-              <Link
-                to="/admin"
-                onClick={() => setShowMobileNav(false)}
                 className="p-2.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground flex items-center gap-2 col-span-2"
               >
-                <Lock className="size-4 text-amber-400" /> Developer Operations Console
+                <MessageSquareText className="size-4" /> 24/7 Support AI
               </Link>
             </div>
           </div>
@@ -446,8 +425,8 @@ export function AppShell({ children }: { children: ReactNode }) {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/developers" className="hover:text-primary transition-colors">
-                    REST API & Cloud SDK
+                  <Link to="/templates" className="hover:text-primary transition-colors">
+                    Escrow Blueprints
                   </Link>
                 </li>
                 <li>
@@ -456,11 +435,8 @@ export function AppShell({ children }: { children: ReactNode }) {
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    to="/admin"
-                    className="hover:text-amber-400 transition-colors flex items-center gap-1"
-                  >
-                    <Lock className="size-3" /> Developer Console
+                  <Link to="/support" className="hover:text-primary transition-colors">
+                    24/7 Support Desk
                   </Link>
                 </li>
               </ul>
