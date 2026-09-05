@@ -93,57 +93,57 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* Main Header */}
       <header className="sticky top-0 z-40 border-b border-border/70 bg-background/90 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 py-3 gap-3 sm:gap-4 w-full">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 gap-2 sm:gap-4 w-full">
           {/* Left: Logo & Brand */}
           <Link to="/" className="shrink-0 flex items-center gap-2">
             <VaultdropLogo size={36} />
           </Link>
 
           {/* Center: Desktop Navigation Links (Centered in header) */}
-          <nav className="hidden lg:flex items-center gap-1 text-xs font-medium text-muted-foreground mx-auto">
+          <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 text-xs font-medium text-muted-foreground mx-auto">
             <Link
               to="/templates"
               activeProps={{ className: "text-foreground bg-muted font-semibold shadow-sm" }}
-              className="px-3 py-1.5 rounded-lg hover:text-foreground hover:bg-muted/50 transition-colors flex items-center gap-1.5 shrink-0"
+              className="px-2.5 xl:px-3 py-1.5 rounded-lg hover:text-foreground hover:bg-muted/50 transition-colors flex items-center gap-1.5 shrink-0"
             >
               <Layers className="size-3.5" /> Templates
             </Link>
             <Link
               to="/explorer"
               activeProps={{ className: "text-foreground bg-muted font-semibold shadow-sm" }}
-              className="px-3 py-1.5 rounded-lg hover:text-foreground hover:bg-muted/50 transition-colors flex items-center gap-1.5 shrink-0"
+              className="px-2.5 xl:px-3 py-1.5 rounded-lg hover:text-foreground hover:bg-muted/50 transition-colors flex items-center gap-1.5 shrink-0"
             >
               <Compass className="size-3.5" /> Explorer
             </Link>
             <Link
               to="/security"
               activeProps={{ className: "text-foreground bg-muted font-semibold shadow-sm" }}
-              className="px-3 py-1.5 rounded-lg hover:text-foreground hover:bg-muted/50 transition-colors flex items-center gap-1.5 shrink-0"
+              className="px-2.5 xl:px-3 py-1.5 rounded-lg hover:text-foreground hover:bg-muted/50 transition-colors flex items-center gap-1.5 shrink-0"
             >
               <ShieldCheck className="size-3.5" /> Security
             </Link>
             <Link
               to="/pricing"
               activeProps={{ className: "text-foreground bg-muted font-semibold shadow-sm" }}
-              className="px-3 py-1.5 rounded-lg hover:text-foreground hover:bg-muted/50 transition-colors flex items-center gap-1.5 shrink-0"
+              className="px-2.5 xl:px-3 py-1.5 rounded-lg hover:text-foreground hover:bg-muted/50 transition-colors flex items-center gap-1.5 shrink-0"
             >
               <Percent className="size-3.5" /> Pricing
             </Link>
             <Link
               to="/support"
               activeProps={{ className: "text-foreground bg-muted font-semibold shadow-sm" }}
-              className="px-3 py-1.5 rounded-lg hover:text-foreground hover:bg-muted/50 transition-colors flex items-center gap-1.5 shrink-0"
+              className="px-2.5 xl:px-3 py-1.5 rounded-lg hover:text-foreground hover:bg-muted/50 transition-colors flex items-center gap-1.5 shrink-0"
             >
               <MessageSquareText className="size-3.5" /> Support
             </Link>
           </nav>
 
           {/* Right Action Bar: Enter Code + Language + My Transfers + Send Files */}
-          <div className="flex items-center gap-2 sm:gap-2.5 md:gap-3 shrink-0 ml-auto lg:ml-0">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 md:gap-3 shrink-0 ml-auto lg:ml-0">
             {/* Quick 6-Digit Room Code Unlock Form (Between Support & EN Language) */}
             <form
               onSubmit={handleJoin}
-              className="hidden md:flex items-center gap-1.5 bg-muted/40 hover:bg-muted/60 px-2.5 py-1 rounded-xl border border-border/80 focus-within:border-primary/60 focus-within:ring-1 focus-within:ring-primary/40 transition-all shadow-inner shrink-0"
+              className="hidden md:flex items-center gap-1.5 bg-muted/40 hover:bg-muted/60 px-2 sm:px-2.5 py-1 rounded-xl border border-border/80 focus-within:border-primary/60 focus-within:ring-1 focus-within:ring-primary/40 transition-all shadow-inner shrink-0"
             >
               <KeyRound className="size-3.5 text-primary shrink-0" />
               <Input
@@ -157,7 +157,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   }
                 }}
                 placeholder="Enter 6-digit code"
-                className="h-7 w-28 text-center text-xs font-mono font-medium tracking-wider bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 placeholder:text-muted-foreground/70"
+                className="h-7 w-24 sm:w-28 text-center text-xs font-mono font-medium tracking-wider bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 placeholder:text-muted-foreground/70"
               />
               <Button
                 type="submit"
@@ -175,7 +175,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <button
                 type="button"
                 onClick={() => setShowLangMenu(!showLangMenu)}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border/70 bg-card/60 hover:bg-muted text-xs font-medium text-foreground transition-colors shrink-0"
+                className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-lg border border-border/70 bg-card/60 hover:bg-muted text-xs font-medium text-foreground transition-colors shrink-0"
                 title="Select International Language"
               >
                 <span className="text-sm">{activeLocaleObj.flag}</span>
@@ -218,7 +218,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               asChild
               variant="outline"
               size="sm"
-              className="hidden sm:flex h-8.5 px-3 text-xs font-medium gap-1.5 border-border/80 shrink-0"
+              className="hidden sm:flex h-8.5 px-2.5 sm:px-3 text-xs font-medium gap-1.5 border-border/80 shrink-0"
             >
               <Link to="/dashboard">
                 <Folder className="size-3.5 text-muted-foreground" />
@@ -230,10 +230,10 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Button
               asChild
               size="sm"
-              className="h-8.5 px-3.5 sm:px-4 text-xs font-bold gap-1.5 bg-gradient-to-r from-primary via-blue-600 to-indigo-600 text-white hover:brightness-110 shadow-md shadow-primary/20 border-0 shrink-0"
+              className="h-8.5 px-2.5 sm:px-3.5 md:px-4 text-xs font-bold gap-1.5 bg-gradient-to-r from-primary via-blue-600 to-indigo-600 text-white hover:brightness-110 shadow-md shadow-primary/20 border-0 shrink-0"
             >
               <Link to="/send">
-                <Upload className="size-3.5" />
+                <Upload className="size-3.5 shrink-0" />
                 <span>Send Files</span>
               </Link>
             </Button>
@@ -332,14 +332,14 @@ export function AppShell({ children }: { children: ReactNode }) {
       </header>
 
       {/* Main Content Area */}
-      <main className="mx-auto w-full max-w-7xl flex-1 px-3 sm:px-6 py-6 sm:py-10">{children}</main>
+      <main className="mx-auto w-full max-w-7xl flex-1 px-3 sm:px-6 lg:px-8 py-4 sm:py-8 lg:py-10">{children}</main>
 
       {/* Enterprise Global Footer */}
       <footer className="mt-auto border-t border-border/60 bg-card/50 backdrop-blur-md">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-12">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
+        <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 sm:gap-8">
             {/* Column 1: Brand & Infrastructure */}
-            <div className="col-span-2 space-y-4">
+            <div className="sm:col-span-2 space-y-4">
               <Link to="/">
                 <VaultdropLogo size={32} />
               </Link>

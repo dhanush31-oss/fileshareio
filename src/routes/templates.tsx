@@ -542,12 +542,12 @@ function TemplatesPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between pt-4 border-t border-border/70">
+            <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2.5 pt-4 border-t border-border/70">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setPreviewTemplate(null)}
-                className="text-xs font-semibold"
+                className="text-xs font-semibold w-full sm:w-auto"
               >
                 Close
               </Button>
@@ -558,7 +558,7 @@ function TemplatesPage() {
                   setPreviewTemplate(null);
                   handleUseTemplate(tpl);
                 }}
-                className="text-xs font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+                className="text-xs font-bold bg-primary text-primary-foreground hover:bg-primary/90 shadow-md w-full sm:w-auto"
               >
                 Use This Template in Escrow Room <ArrowRight className="size-3.5 ml-1" />
               </Button>

@@ -731,7 +731,7 @@ function SendPage() {
                   Auto-sets network
                 </span>
               </Label>
-              <div className="grid grid-cols-2 xs:grid-cols-4 sm:grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {POPULAR_ASSETS.map((asset) => {
                   const isSelected = currencyName.toUpperCase() === asset.symbol.toUpperCase();
                   return (
